@@ -1,7 +1,9 @@
-function sumNums(...nums) {
-  let sum = 0;
-  for(let i = 0; i <nums.length; i++)
-    sum += nums[i]
-  return sum;
+function add(...[a, b, c]) {
+  console.log(a);
+  console.log(b);
+  console.log(c)
+  let total = 0;
+ 
 }
-console.log(sumNums(1,1,1,1,1));
+const result = add(5, 10, 20)
+console.log(result);

@@ -1,6 +1,6 @@
-function strFun(p1) {
-  p1 = "eleven"
+function StrFun(p1) {
+  p1.value = "eleven"
 }
-var a = "ten"
-strFun(a);
-console.log(a)
+var a = {value: "ten"}
+StrFun(a)
+console.log(a.value);

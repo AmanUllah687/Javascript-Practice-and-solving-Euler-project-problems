@@ -1,6 +1,9 @@
-function StrFun(p1) {
-  p1.value = "eleven"
+const square = function(number) {
+  return number * number
 }
-var a = {value: "ten"}
-StrFun(a)
-console.log(a.value);
+var x = square(4)
+console.log(x)
+ const factorial = function fac(n) {
+  return n < 2 ? 1 : n * fac(n - 1)
+ }
+ console.log(factorial(3));

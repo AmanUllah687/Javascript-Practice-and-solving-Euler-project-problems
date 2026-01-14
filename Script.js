@@ -1,2 +1,8 @@
-const mult=(a,b)=>{a = a !== undefined ? a : 0;b = b !== undefined ?  b : 1; return a*b;}
-console.log(mult(2,3))
+// Defining a class in js (prototype based)
+function Employee(){
+    this.name = '';
+    this.dept = 'General';
+}
+var eObj = new Employee();
+console.log(eObj.dept);
+

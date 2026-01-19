@@ -4,13 +4,15 @@ class Rectangle {
         this.width = width;
     }
 // Getter
-get area () {
-   return this.calcArea();
+get Height() {
+   return this.height;
 }
 // Method
-calcArea() {
-    return this.height * this.width;
+setHieght(height) {
+     this.height = height;
 }
 }
-const square = new Rectangle(10,10);
-console.log(square.area);
+const rect = new Rectangle(10,15);
+console.log(rect.height); // 10
+rect.setHieght(20);
+console.log(rect.height); // 20

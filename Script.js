@@ -1,17 +1,20 @@
-class Point {
-constructor(x,y) {
-    this.x = x;
-    this.y = y;
+class Rectangle {
+    height = 0;
+    width;
+    constructor(height, width) {
+        this.height = height;
+        this.width = width;
+    }
+    get Height() {
+        return this.height;
+    }
+    setHeight(height) {
+        this.height = height;
+    }
+
 }
-static distance(a,b) {
-    const dx = a.x - b.x;
-    const dy =a.y - b.y;
-    
-    return Math.hypot(dx,dy) 
-}
-}
-const p1 = new Point(5,5);
-const p2 = new Point(10,10);
-p1.distance;
-p2.distance;
-console.log(Point.distance(p1, p2));
+var rect = new Rectangle(10, 15);
+console.log(`Height of rectanle is ${rect.height} cm`);
+console.log(rect.height);
+rect.setHeight(20);
+console.log(rect.height);

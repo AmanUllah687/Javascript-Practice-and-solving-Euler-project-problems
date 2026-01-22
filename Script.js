@@ -1,19 +1,18 @@
-class Rectangle {
-    #height = 0;
-    #width;
-    constructor(height, width) {
-        this.#height = height;
-        this.#width = width;
+class Animal {
+    constructor(name) {
+        this.name = name;
     }
-    get Hieght() {
-        return this.#height
-    }
-    setHeight(height) {
-        this.#height = height
+    speak() {
+           console.log(`${this.name} Makes a Noise.`)
     }
 }
-var rect = new Rectangle (10, 15);
-console.log(`The Hieght of Rectangle is ${rect.height} cm`)
-console.log(rect.height);
-rect.setHeight(20);
-console.log(rect.height)
+class Dog extends Animal {
+    constructor(name) {
+        super(name);
+    }
+    speak() {
+        console.log(`${this.name} Barks.`)
+    }
+}
+let d = new Dog('Random Dog')
+d.speak();

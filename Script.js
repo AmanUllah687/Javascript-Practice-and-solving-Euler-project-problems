@@ -1,18 +1,44 @@
-class Animal {
-    constructor(name) {
+class Employee {
+    constructor(name, dept = "general") {
         this.name = name;
+        this.dept = dept;
     }
-    speak() {
-           console.log(`${this.name} Makes a Noise.`)
+
+    get Dept() {
+        return this.dept;
     }
-}
-class Dog extends Animal {
-    constructor(name) {
-        super(name);
-    }
-    speak() {
-        console.log(`${this.name} Barks.`)
+
+    setDept(dept) {
+        this.dept = dept;
     }
 }
-let d = new Dog('Random Dog')
-d.speak();
+
+class Manager extends Employee {
+    constructor(name, dept, reports = []) {
+        super(name, dept);
+        this.reports = reports;
+    }
+}
+
+class WorkerBee extends Employee {
+    constructor(name, dept, projects = []) {
+        super(name, dept);
+        this.projects = projects;
+    }
+}
+
+class SalesPerson extends WorkerBee {
+    constructor(name, dept, projects, quota = 100) {
+        super(name, dept, projects);
+        this.quota = quota;
+    }
+}
+var rect = new SalesPerson("","sales", [], [""], 100);
+class Engineer extends WorkerBee {
+    constructor(name, dept, projects, quota, machine = "") {
+        super(name, dept, projects, quota);
+        this.machine = machine;
+    }
+}
+var Aman = new SalesPerson("", "Engineering", [], [""], 100);
+console.log(Aman.dept);

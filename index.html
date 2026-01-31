@@ -4,21 +4,16 @@
   <title>JS Test</title>
 </head>
 <body>
-  <h1>Hello JS</h1>
-  <button id="nextButton">
-  Next
-</button>
-<h3 id="header"></h3>
-<button id="moreButton"></button>
-<p id="description"></p>
-<img id="image">
+  <label for="weather">Select the weather type today: </label>
+<select id="weather">
+  <option value="">--Make a choice--</option>
+  <option value="sunny">Sunny</option>
+  <option value="rainy">Rainy</option>
+  <option value="snowing">Snowing</option>
+  <option value="overcast">Overcast</option>
+</select>
 
-<style>
-* { box-sizing: border-box; }
-body { font-family: sans-serif; margin: 20px; padding: 0; }
-button { display: block; margin-bottom: 10px; }
-</style>
-
-  <script src="script.js"></script>
+<p></p>
+ <script src="script.js"></script>
 </body>
 </html>

@@ -6,15 +6,20 @@
 </head>
 <body>
  <label for="theme">Select theme: </label>
-<select id="theme">
-  <option value="white">White</option>
-  <option value="black">Black</option>
-  <option value="purple">Purple</option>
-  <option value="yellow">Yellow</option>
-  <option value="psychedelic">Psychedelic</option>
-</select>
-
-<h1>This is my website</h1>
+ <form name="selectForm">
+  <label for="musicTypes"
+    >Choose some music types, then click the button below:</label
+  >
+  <select id="musicTypes" name="musicTypes" multiple>
+    <option selected>R&amp;B</option>
+    <option>Jazz</option>
+    <option>Blues</option>
+    <option>New Age</option>
+    <option>Classical</option>
+    <option>Opera</option>
+  </select>
+  <button id="btn" type="button">How many are selected?</button>
+</form>
  <script src="script.js"></script>
 </body>
 </html>

@@ -1,5 +1,6 @@
 html {
   font-family: sans-serif;
+  height: 95%;
 }
 
 h2 {
@@ -15,24 +16,5 @@ h2 {
 
 body {
   margin: 10px;
-  background: #f5f9fa;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-ul {
-  padding-left: 0;
-}
-
-li {
-  display: block;
-  float: left;
-  width: 25%;
-  border: 2px solid white;
-  padding: 5px;
-  height: 40px;
-  background-color: #4a2db6;
-  color: white;
+  height: inherit;
 }

@@ -1,6 +1,8 @@
-const obj = {foo: 1, bar: 2};
- for( const [Key, val] of Object.entries(obj)) {
-  console.log(Key, val);
- }
- // "foo" 1
- // "bar" 2
+const obj =  {};
+obj.x = 3
+console.log(obj.x);
+console.log(obj);
+ const key = "y";
+ obj[key] = 5
+ console.log(obj[key]);
+ console.log(obj);

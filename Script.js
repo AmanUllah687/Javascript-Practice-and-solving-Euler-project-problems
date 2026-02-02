@@ -1,4 +1,16 @@
-const foo = ["one", "two", "three"];
+function f() {
+    console.log("F!");
+    return 2;
+}
+function g() {
+    console.log("G!");
+    return 3;
+}
+let x, y;
 
-const [one, two, three] =  foo;
-console.log(one);
+y = x = f();
+console.log(y);
+y = [f(), x= g()];
+console.log(y);
+x[f()] = g();
+console.log(x);

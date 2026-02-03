@@ -1,16 +1,7 @@
-function f() {
-    console.log("F!");
-    return 2;
-}
-function g() {
-    console.log("G!");
-    return 3;
-}
-let x, y;
+const x = [0,1,2,3,4,5,6,7,8,9];
+const a = [x,x,x,x,x];
 
-y = x = f();
-console.log(y);
-y = [f(), x= g()];
-console.log(y);
-x[f()] = g();
-console.log(x);
+for (let i = 0, j = 9; i<=j; i++, j--) {
+
+    console.log(`a[${i}][${j}] = ${a[i][j]}`)
+}

@@ -1,19 +1,7 @@
-function getFullName() {
-  return `${this.firstName} ${this.lastName}`;
+function addSquares(a,b) {
+  function square(x) {
+  return x * x;
+  }
+  return square(a) + square(b);
 }
-const person1 = {
-  firstName: "Chris",
-  lastName: "Martin",
-};
-
-const person2 = {
-  firstName: "Chester",
-  lastName: "Bennington",
-};
-
-// Attach the same function
-person1.getFullName = getFullName;
-person2.getFullName = getFullName;
-
-console.log(person1.getFullName()); // "Chris Martin"
-console.log(person2.getFullName()); // "Chester Bennington"
+console.log(addSquares(2,2));

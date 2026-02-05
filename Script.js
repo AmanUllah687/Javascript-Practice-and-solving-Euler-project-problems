@@ -1,4 +1,9 @@
-const square = function (number) {
-  return number * number;
-};
-console.log(square(4));
+function foo(i) {
+    if(i<0) {
+        return;
+    }
+    console.log(`begin: ${i}`);
+    foo(i-1);
+    console.log(`end: ${i}`);
+}
+foo(3);

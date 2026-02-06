@@ -1,10 +1,9 @@
-function A(x) {
-    function B(y) {
-        function C(z) {
-            console.log(x + y + z);
-        }
-        C(3)
-    }
- B(2)
+function outSide() {
+  const  x = 5;
+  function inside(x) {
+    return x * 2;
+
+  }
+  return inside;
 }
-A(1)
+console.log(outSide()(10)); // 20(Instead of 10)

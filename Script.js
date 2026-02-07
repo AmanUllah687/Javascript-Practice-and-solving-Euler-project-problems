@@ -1,6 +1,9 @@
-function multiply(multiplyer,...theArgs) {
-  return theArgs.map((x) => multiplyer * x);
+const a = ["Hydrogen", "Helium", "Lithium", "Beryllium"];
 
-}
-const arry = multiply(2,1,2,3);
-console.log(arry); // [2 , 4 , 6]
+const a2 = a.map(function(s) {
+  return s.length;
+})
+console.log(a2); // [8,6,7,9]
+
+const a3 = a.map((s) => s.length);
+console.log(a3);

@@ -1,9 +1,9 @@
-function outSide() {
-  const  x = 5;
-  function inside(x) {
-    return x * 2;
-
+function myConcat (separator) {
+  let result = ""; // initializes list
+  // iterate through arguments
+  for(i=1; i<arguments.length; i++) {
+    result += arguments[i] + separator;
   }
-  return inside;
+  return result;
 }
-console.log(outSide()(10)); // 20(Instead of 10)
+ console.log(myConcat(",","red","orange","blue"));

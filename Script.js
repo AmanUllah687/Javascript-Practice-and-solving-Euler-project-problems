@@ -1,4 +1,6 @@
-function multiply(a, b= 1) {
-  return a*b;
+function multiply(multiplyer,...theArgs) {
+  return theArgs.map((x) => multiplyer * x);
+
 }
-console.log(multiply(5)); // 5
+const arry = multiply(2,1,2,3);
+console.log(arry); // [2 , 4 , 6]

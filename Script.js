@@ -1,10 +1,8 @@
-console.log("1");
-setTimeout(() => {
-  console.log("2");
-},0);
-console.log("3");
-
-const names = ["James", "Jess", "lily", "Savy"];
-names.forEach((name) => {
-  console.log(name);
+const loadPokemon = (id, cb) =>  {
+  fetch(`https://pokeapi.co/api/v2/pokemon/${id}`)
+  .then(res =>res.json())
+  .then(data => {cb(data)})
+}
+loadPokemon(56, (pokemon) => {
+  console.log(pokemon);
 })

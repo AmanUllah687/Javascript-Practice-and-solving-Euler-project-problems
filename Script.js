@@ -1,9 +1,10 @@
-const a = ["Hydrogen", "Helium", "Lithium", "Beryllium"];
+console.log("1");
+setTimeout(() => {
+  console.log("2");
+},0);
+console.log("3");
 
-const a2 = a.map(function(s) {
-  return s.length;
+const names = ["James", "Jess", "lily", "Savy"];
+names.forEach((name) => {
+  console.log(name);
 })
-console.log(a2); // [8,6,7,9]
-
-const a3 = a.map((s) => s.length);
-console.log(a3);

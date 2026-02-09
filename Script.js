@@ -1,10 +1,16 @@
-console.log("1");
-setTimeout(() => {
-  console.log("2");
-},0);
-console.log("3");
+const SCRIPTS = [
+  { name: "Adlam", living: true },
+  { name: "Latin", living: true },
+  { name: "Ancient Greek", living: false }
+];
 
-const names = ["James", "Jess", "lily", "Savy"];
-names.forEach((name) => {
-  console.log(name);
-})
+function map(array, transform) {
+  let mapped = [];
+  for (let element of array) {
+    mapped.push(transform(element));
+  }
+  return mapped;
+}
+
+let rtlScripts = SCRIPTS.filter(s => s.direction == "rtl");
+console.log(map(rtlScripts, s => s.name));

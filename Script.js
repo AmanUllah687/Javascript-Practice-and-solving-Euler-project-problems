@@ -1,16 +1,8 @@
-const SCRIPTS = [
-  { name: "Adlam", living: true },
-  { name: "Latin", living: true },
-  { name: "Ancient Greek", living: false }
-];
-
-function map(array, transform) {
-  let mapped = [];
-  for (let element of array) {
-    mapped.push(transform(element));
-  }
-  return mapped;
+let roseDragon = "🌹🐉";
+for (let char of roseDragon) {
+  console.log(char);
 }
-
-let rtlScripts = SCRIPTS.filter(s => s.direction == "rtl");
-console.log(map(rtlScripts, s => s.name));
+let arrays = [[1, 2, 3], [4, 5], [6]];
+const flattened = arrays.reduce((a, b) => a.concat(b), []);
+console.log(flattened);
+// → [1, 2, 3, 4, 5, 6]

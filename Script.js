@@ -1,6 +1,4 @@
-console.log(Array.prototype.flat.call({}));
-const a = {
-  length: 0.7
+function f() {
+ console.log(Array.prototype.join.call(arguments, "+"));
 }
-Array.prototype.push.call(a);
-console.log(a);
+f("a", "b");

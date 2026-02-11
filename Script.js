@@ -1,6 +1,6 @@
-const arryLike = {
- 0 : "1",
- 1: "2",
- length: 2,
-};
-console.log(Array.prototype.join.call(arryLike, "+"));
+console.log(Array.prototype.flat.call({}));
+const a = {
+  length: 0.7
+}
+Array.prototype.push.call(a);
+console.log(a);

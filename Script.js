@@ -1,8 +1,6 @@
-let roseDragon = "🌹🐉";
-for (let char of roseDragon) {
-  console.log(char);
-}
-let arrays = [[1, 2, 3], [4, 5], [6]];
-const flattened = arrays.reduce((a, b) => a.concat(b), []);
-console.log(flattened);
-// → [1, 2, 3, 4, 5, 6]
+const arryLike = {
+ 0 : "1",
+ 1: "2",
+ length: 2,
+};
+console.log(Array.prototype.join.call(arryLike, "+"));

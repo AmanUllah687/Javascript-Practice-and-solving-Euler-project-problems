@@ -1,6 +1,6 @@
-const fruits = ["Apple", "Banana", "Strawberry", "Mango"];
-const start = 1
+const fruits = ["Apple", "Banana", "Strawberry"];
+const start = -2;
 const deleteCount = 2;
-const removedItem = fruits.splice(start, deleteCount);
+const removedItems = fruits.splice(start, deleteCount, "Mango", "Cherry");
 console.log(fruits);
-console.log(removedItem);
+console.log(removedItems);

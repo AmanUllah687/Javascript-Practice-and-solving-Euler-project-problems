@@ -1,5 +1,7 @@
 const fruits = ["Apple", "Banana"];
-console.log(fruits.includes("Apple"));
-console.log(fruits.includes("Cherry"));
-console.log(fruits.indexOf("Banana") !== -1);
-console.log(fruits.indexOf("Cherry") !== -1);
+const newLength = fruits.push("Orange");
+ console.log(fruits);
+ console.log(newLength);
+ const removedItem = fruits.pop();
+ console.log(fruits);
+  console.log(removedItem);

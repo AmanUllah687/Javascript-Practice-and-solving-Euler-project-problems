@@ -1,4 +1,3 @@
-function f() {
- console.log(Array.prototype.join.call(arguments, "+"));
-}
-f("a", "b");
+const fruits = ["Apple", "Banana"];
+const stringFruit = fruits.join(",");
+console.log(stringFruit);

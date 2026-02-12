@@ -1,4 +1,4 @@
 const fruits = ["Apple", "Banana", "Strawberry"];
-for(const fruit of fruits) {
-    console.log(fruit);
-}
+fruits.forEach((item, index, array) => {
+    console.log(item,index);
+});

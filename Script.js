@@ -1,7 +1,5 @@
-const fruits = ["Apple", "Banana"];
-const newLength = fruits.push("Orange");
- console.log(fruits);
- console.log(newLength);
- const removedItem = fruits.pop();
- console.log(fruits);
-  console.log(removedItem);
+const fruits = ["Apple", "Banana", "Strawberry", "Mango", "Cherry"];
+const start = -3;
+const removedItems = fruits.splice(start);
+console.log(fruits);
+console.log(removedItems);

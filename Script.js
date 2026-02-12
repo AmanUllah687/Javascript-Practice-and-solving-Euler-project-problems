@@ -1,4 +1,6 @@
 const fruits = ["Apple", "Banana", "Strawberry"];
-fruits.forEach((item, index, array) => {
-    console.log(item,index);
-});
+const moreFruits = ["Mango", "Cherry"];
+const combinedFruits = fruits.concat(moreFruits);
+console.log(combinedFruits);
+console.log(fruits);
+console.log(moreFruits);

@@ -12,3 +12,6 @@ console.log(copiedFruits1);
 // Coppying Array using slice() method
 const copiedFruits2 = fruits.slice()
 console.log(copiedFruits);
+
+const fruitsDeepCopy = JSON.parse(JSON.stringify(fruits));
+console.log(fruitsDeepCopy);

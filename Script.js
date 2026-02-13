@@ -1,17 +1,17 @@
-const fruits = ["Strawberry", "Mango"];
+const board = [
+  ["R", "N", "B", "Q", "K", "B", "N", "R"],
+  ["P", "P", "P", "P", "P", "P", "P", "P"],
+  [" ", " ", " ", " ", " ", " ", " ", " "],
+  [" ", " ", " ", " ", " ", " ", " ", " "],
+  [" ", " ", " ", " ", " ", " ", " ", " "],
+  [" ", " ", " ", " ", " ", " ", " ", " "],
+  ["p", "p", "p", "p", "p", "p", "p", "p"],
+  ["r", "n", "b", "q", "k", "b", "n", "r"],
+];
 
-// Coppying Array using spread method
-const copiedFruits = [...fruits];
-console.log(copiedFruits);
+console.log(`${board.join("\n")}\n\n`);
 
-
-// Coppying Array using from() method
-const copiedFruits1 = Array.from(fruits);
-console.log(copiedFruits1);
-
-// Coppying Array using slice() method
-const copiedFruits2 = fruits.slice()
-console.log(copiedFruits);
-
-const fruitsDeepCopy = JSON.parse(JSON.stringify(fruits));
-console.log(fruitsDeepCopy);
+// Move king Pawn Forward 2
+board[4][4] = board[6][4];
+board[4][6] = " ";
+console.log(board.join("\n"));

@@ -1,22 +1,23 @@
-
 const myCar = {
   make: "Ford",
   model: "Mustang",
   year: 1969,
 };
 
-function showProps(obj, objName) {
-  let result = "";
+function showAllProperties(myObj) {
+  let objectToInspect = myObj;
+  let result = [];
 
-  for (const i in obj) {
-    if (Object.hasOwn(obj, i)) {
-           // Object.hasOwn() is used to exclude properties from the object's
-    // prototype chain and only show "own properties"
-      result += `${objName}.${i} = ${obj[i]}\n`;
-    }
+  while (objectToInspect !== null) {
+    result = result.concat(
+      Object.getOwnPropertyNames(objectToInspect)
+    );
+    objectToInspect = Object.getPrototypeOf(objectToInspect);
   }
 
-  console.log(result);
+   
+    return console.log([...new Set(result)]);
 }
 
-showProps(myCar, "myCar");
+showAllProperties(myCar);
+ console.log(result);

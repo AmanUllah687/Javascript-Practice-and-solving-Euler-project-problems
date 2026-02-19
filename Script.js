@@ -1,23 +1,22 @@
-const myObj = {};
-const str = "myString";
-const rand = Math.random();
-const anotherObj = {};
 
-// Create additional properties on myObj
-myObj.type = "Dot syntax for a key named type";
-myObj["date created"] = "This key has a space";
-myObj[str] = "This key is in variable str";
-myObj[rand] = "A random number is the key here";
-myObj[anotherObj] = "This key is object anotherObj";
-myObj[""] = "This key is an empty string";
+const myCar = {
+  make: "Ford",
+  model: "Mustang",
+  year: 1969,
+};
 
-console.log(myObj);
-// {
-//   type: 'Dot syntax for a key named type',
-//   'date created': 'This key has a space',
-//   myString: 'This key is in variable str',
-//   '0.6398914448618778': 'A random number is the key here',
-//   '[object Object]': 'This key is object anotherObj',
-//   '': 'This key is an empty string'
-// }
-console.log(myObj.myString); // 'This key is in variable str'
+function showProps(obj, objName) {
+  let result = "";
+
+  for (const i in obj) {
+    if (Object.hasOwn(obj, i)) {
+           // Object.hasOwn() is used to exclude properties from the object's
+    // prototype chain and only show "own properties"
+      result += `${objName}.${i} = ${obj[i]}\n`;
+    }
+  }
+
+  console.log(result);
+}
+
+showProps(myCar, "myCar");

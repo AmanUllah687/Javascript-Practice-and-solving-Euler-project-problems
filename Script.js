@@ -1,6 +1,6 @@
-try {
-    throw new Error()
-} catch(e) {
-    var e = 2; // Works
-}
-console.log(e); // undefined 
+var a = 0;
+ b = 0;
+ var a = "A";
+ var b = a;
+console.log(a);
+console.log(b);

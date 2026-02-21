@@ -1,4 +1,6 @@
-"Use Strict"
-var x = 1;
-Object.hasOwn(globalThis, "x");
-delete globalThis.x
+try {
+    throw new Error()
+} catch(e) {
+    var e = 2; // Works
+}
+console.log(e); // undefined 

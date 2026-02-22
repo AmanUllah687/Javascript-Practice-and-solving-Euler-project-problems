@@ -1,5 +1,16 @@
-function calculateSales(unitsA, unitsB, unitsC) {
-    return unitsA * 79 + unitsB * 129 + unitsC * 699;
-}
-console.log(calculateSales(1,1,1));
+// First fullName variable defined in the global scope:
+const fullName = "Oluwatobi Sofela";
 
+// Nested functions containing two more fullName variables:
+function profile() {
+  const fullName = "Tobi Sho";
+  function sayName() {
+    const fullName = "Oluwa Sofe";
+    function writeName() {
+      return fullName;
+    }
+    return writeName();
+  }
+  return sayName();
+}
+console.log(profile());

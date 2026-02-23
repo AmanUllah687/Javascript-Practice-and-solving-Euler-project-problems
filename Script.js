@@ -1,15 +1,10 @@
-function showLastName() {
-    const lastName = "Sofela";
-    return lastName;
-}
+function makeFunc () {
+    const name = "Mozilla";
+    function displayName() {
+        console.log(name);
 
-// Define another function 
-function displayFullName() {
-    const fullName = "Oluwatobi"  +  showLastName();
-    return fullName;
+    }
+    return displayName()
 }
-// invoke displayFullName
-console.log(displayFullName())
-
-//invocation will be Writen
- "Oluwatobi Sofela"
+const myFunc = makeFunc();
+myFunc();

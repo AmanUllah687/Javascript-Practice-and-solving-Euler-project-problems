@@ -1,10 +1,10 @@
-function makeFunc () {
-    const name = "Mozilla";
-    function displayName() {
-        console.log(name);
-
-    }
-    return displayName()
+function makeAdder(x) {
+    return function(y) {
+        return x + y;
+    };
 }
-const myFunc = makeFunc();
-myFunc();
+
+const add5 = makeAdder(5);
+const add10 = makeAdder(10);
+
+console.log(add5(2));

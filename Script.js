@@ -1,12 +1,29 @@
-function makeSizer(size) {
-    return () => {
-        document.body.style.fontSize =`${size}px`;
-    };
-}
-const sizer12 = makeSizer(12);
-const sizer14 = makeSizer(14);
-const sizer16 = makeSizer(16);
+const counter = (function () {
+    let privateCounter = 0;
+    function changeBy(Val) {
+      privateCounter += Val;
 
-document.getElementById("size-12").onclick = sizer12;
-document.getElementById("size-14").onclick = sizer14;
-document.getElementById("size-16").onclick = sizer16;
+    }
+    return  {
+        increment() {
+            changeBy(1);
+        },
+        decerement() {
+            changeBy(-1);
+
+        },
+        value() {
+          return  privateCounter;
+        },
+
+    };
+    
+})();
+
+console.log(counter.value()); // 0
+counter.increment();
+counter.increment();
+console.log(counter.value()); // 2.
+
+counter.decrement();
+console.log(counter.value()); // 1

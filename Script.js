@@ -1,10 +1,12 @@
-function makeAdder(x) {
-    return function(y) {
-        return x + y;
+function makeSizer(size) {
+    return () => {
+        document.body.style.fontSize =`${size}px`;
     };
 }
+const sizer12 = makeSizer(12);
+const sizer14 = makeSizer(14);
+const sizer16 = makeSizer(16);
 
-const add5 = makeAdder(5);
-const add10 = makeAdder(10);
-
-console.log(add5(2));
+document.getElementById("size-12").onclick = sizer12;
+document.getElementById("size-14").onclick = sizer14;
+document.getElementById("size-16").onclick = sizer16;

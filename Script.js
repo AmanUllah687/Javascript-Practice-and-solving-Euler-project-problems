@@ -1,5 +1,23 @@
-import { getX, setX } from "./myModule.js";
-console.log(getX()); // 5
-setX(6);
-console.log(getX()); // 6
+function showHelp(help) {
+    document.getElementById("help").textContent = help;
+}
 
+function makeHelpCallBack(help) {
+    return function () {
+    showHelp(help);
+    };
+}
+
+function setUpHelp() {
+    var helpText = [
+        { id: "email", help: "Your email address" },
+    { id: "name", help: "Your full name" },
+    { id: "age", help: "Your age (you must be over 16)" },
+    ];
+
+    for(var i = 0; i< helpText.length; i++) {
+        var item = helpText[i];
+        document.getElementById(item.id).onfocus = makeHelpCallBack(item.help);
+    }
+}
+setUpHelp();

@@ -1,29 +1,11 @@
-const counter = (function () {
-    let privateCounter = 0;
-    function changeBy(Val) {
-      privateCounter += Val;
-
+function outer() {
+    let getY
+    {
+        const y = 6;
+        getY = () => y
     }
-    return  {
-        increment() {
-            changeBy(1);
-        },
-        decerement() {
-            changeBy(-1);
+    console.log(typeof y); // undefined
+  console.log(getY()); // 6
+}
 
-        },
-        value() {
-          return  privateCounter;
-        },
-
-    };
-    
-})();
-
-console.log(counter.value()); // 0
-counter.increment();
-counter.increment();
-console.log(counter.value()); // 2.
-
-counter.decrement();
-console.log(counter.value()); // 1
+outer();

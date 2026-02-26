@@ -1,11 +1,5 @@
-function outer() {
-    let getY
-    {
-        const y = 6;
-        getY = () => y
-    }
-    console.log(typeof y); // undefined
-  console.log(getY()); // 6
-}
+import { getX, setX } from "./myModule.js";
+console.log(getX()); // 5
+setX(6);
+console.log(getX()); // 6
 
-outer();

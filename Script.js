@@ -1,23 +1,22 @@
 function showHelp(help) {
-    document.getElementById("help").textContent = help;
+  document.getElementById("help").textContent = help;
 }
 
-function makeHelpCallBack(help) {
-    return function () {
-    showHelp(help);
-    };
-}
-
-function setUpHelp() {
-    var helpText = [
-        { id: "email", help: "Your email address" },
+function setupHelp() {
+  const helpText = [
+    { id: "email", help: "Your email address" },
     { id: "name", help: "Your full name" },
     { id: "age", help: "Your age (you must be over 16)" },
-    ];
+  ];
 
-    for(var i = 0; i< helpText.length; i++) {
-        var item = helpText[i];
-        document.getElementById(item.id).onfocus = makeHelpCallBack(item.help);
+  helpText.forEach((item) => {
+    const element = document.getElementById(item.id);
+
+    if (element) {
+      element.addEventListener("focus", function () {
+        showHelp(item.help);
+      });
     }
+  });
 }
-setUpHelp();
+setupHelp();

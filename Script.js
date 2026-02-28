@@ -1,21 +1,12 @@
-function Point(x, Y) {
-  this.x = x; 
-  this.y = Y;
+function Point(x, y) {
+  this.x = x;
+  this.y = y;
 }
-Point.prototype.tostring = function () {
-  return  `${this.x},${this.y}`;
-}
+const emptyObj = {}
+const YAxisPoint = Point.bind(emptyObj , 0);
 
-const p = new Point(1, 2);
-console.log(p.tostring());
-// The thisArg's value doesn't matter because it's ignored
-const YAxisPoint = Point.bind(null, 0 /* x */);
-const axisPoint = new YAxisPoint(5);
-console.log(axisPoint.tostring()); // '0,5'
-
-console.log(axisPoint instanceof Point);
-console.log(axisPoint instanceof YAxisPoint);
-console.log(new YAxisPoint(17, 42) instanceof Point);
-
-
-
+// Can still be called as a normal function
+// (although usually this is undesirable)
+YAxisPoint(13);
+// The modifications to `this` is now observable from the outside
+console.log(emptyObj); // { x: 0, y: 13 }

@@ -1,6 +1,7 @@
-const slice = Array.prototype.slice;
+// Same as "slice" in the previous example
+const unboundSlice = Array.prototype.slice;
+const slice = Function.prototype.call.bind(unboundSlice);
 
-//...
- slice.call(arguments);
+// …
 
- 
+slice(arguments);

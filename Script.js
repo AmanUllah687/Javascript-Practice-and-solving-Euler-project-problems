@@ -1,12 +1,6 @@
-class Base {
-  static baseProp = "base";
+const slice = Array.prototype.slice;
 
-}
-class Derived extends Base {
-  static derivedProp = "derived";
-}
+//...
+ slice.call(arguments);
 
-const BoundDerived = Derived.bind(null) 
-console.log(BoundDerived.baseProp); // "base"
-console.log(BoundDerived.derivedProp); // undefined
-console.log(new BoundDerived() instanceof Derived); // true
+ 

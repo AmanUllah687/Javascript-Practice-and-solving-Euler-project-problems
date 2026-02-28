@@ -1,22 +1,19 @@
-function showHelp(help) {
-  document.getElementById("help").textContent = help;
-}
+// Top-level 'this' is bound to 'globalThis' in scripts.
+this.x = 9;
+const module = {
+  x: 81,
+  getX() {
+    return this.x;
+  },
+};
 
-function setupHelp() {
-  const helpText = [
-    { id: "email", help: "Your email address" },
-    { id: "name", help: "Your full name" },
-    { id: "age", help: "Your age (you must be over 16)" },
-  ];
+// The 'this' parameter of 'getX' is bound to 'module'.
+console.log(module.getX()); // 81
 
-  helpText.forEach((item) => {
-    const element = document.getElementById(item.id);
+const retrieveX = module.getX;
+// The 'this' parameter of 'retrieveX' is bound to 'globalThis' in non-strict mode.
+console.log(retrieveX()); // 9
 
-    if (element) {
-      element.addEventListener("focus", function () {
-        showHelp(item.help);
-      });
-    }
-  });
-}
-setupHelp();
+// Create a new function 'boundGetX' with the 'this' parameter bound to 'module'.
+const boundGetX = retrieveX.bind(module);
+console.log(boundGetX()); // 81

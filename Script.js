@@ -1,12 +1,12 @@
-function Point(x, y) {
-  this.x = x;
-  this.y = y;
-}
-const emptyObj = {}
-const YAxisPoint = Point.bind(emptyObj , 0);
+class Base {
+  static baseProp = "base";
 
-// Can still be called as a normal function
-// (although usually this is undesirable)
-YAxisPoint(13);
-// The modifications to `this` is now observable from the outside
-console.log(emptyObj); // { x: 0, y: 13 }
+}
+class Derived extends Base {
+  static derivedProp = "derived";
+}
+
+const BoundDerived = Derived.bind(null) 
+console.log(BoundDerived.baseProp); // "base"
+console.log(BoundDerived.derivedProp); // undefined
+console.log(new BoundDerived() instanceof Derived); // true

@@ -1,12 +1,14 @@
-const obj4 = {
-  name: "obj4",
-  getThis() {
-    return this;
-  },
-};
+const myFirstPromise = new Promise((resolve, reject) => {
+// We Call Resolve(...) when what we  were doing asynchronusly
+// was succesfull and reject(...) when it Failed 
 
-const obj5 = { name: "obj5" };
+setTimeout(() => {
+ resolve("Success!"); //Yay! Every Thing went Well!
+},250);
+});
 
-obj5.getThis = obj4.getThis;
-console.log(obj5.getThis()); // { name: 'obj5', getThis: [Function: getThis] }
-console.log(obj5.getThis());
+myFirstPromise.then((successMessage) => {
+  // successMessage is whatever we passed in the resolve(...) function above.
+  // It doesn't have to be a string, but if it is only a succeed message, it probably will be.
+  console.log(`Yay! ${successMessage}`)
+});

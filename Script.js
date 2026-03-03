@@ -1,14 +1,52 @@
-const myFirstPromise = new Promise((resolve, reject) => {
-// We Call Resolve(...) when what we  were doing asynchronusly
-// was succesfull and reject(...) when it Failed 
+// To experiment with error handling, "threshold" values cause errors randomly
 
-setTimeout(() => {
- resolve("Success!"); //Yay! Every Thing went Well!
-},250);
-});
+const THRESHOLD_A = 8;
+function tetheredGetNumber(resolve, reject)  {
+  setTimeout(() => {
+    const randomInt = Date.now();
+    const value = randomInt % 10;
+    if(value < THRESHOLD_A) {
+      resolve(value);
+    } else {
+      reject(new RangeError(`Too large: ${value}`));
+    }
+  }, 500);
+}
 
-myFirstPromise.then((successMessage) => {
-  // successMessage is whatever we passed in the resolve(...) function above.
-  // It doesn't have to be a string, but if it is only a succeed message, it probably will be.
-  console.log(`Yay! ${successMessage}`)
-});
+function determinParity(value) {
+  const isOdd = value % 2 === 1;
+  return {value, isOdd};
+} 
+
+function troubleWithGetNumber(reason) {
+  const err = new Error("Trouble Getting Number", {cause: reason});
+  console.error(err);
+  throw err;
+}
+
+function promisGetWord(parityInfo) {
+  return new Promise((resolve, reject) => {
+    const {value , isOdd} = parityInfo;
+    if(value <= THRESHOLD_A - 1) {
+      reject(new RangeError(`Still Too large: ${value}`));
+    } else {
+      parityInfo.wordEvenOdd = isOdd ? "odd" : "even";
+      resolve(parityInfo); 
+    }
+  });
+}
+new Promise(tetheredGetNumber)
+    .then(determinParity, troubleWithGetNumber)
+    .then(promisGetWord)
+    .then((info) => {
+      console.log(`Got: ${info.value}, ${info.wordEvenOdd}`);
+      return info;
+    })
+    .catch((reason) => {
+      if(reason.cause) {
+        console.log("Had Previusly Handled Error");
+      } else {
+        console.log(`Trouble with getPromiseWord(): ${reason}`);
+      }
+    })
+    .finally((info) => console.log("All done"));

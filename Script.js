@@ -1,52 +1,43 @@
-// To experiment with error handling, "threshold" values cause errors randomly
+"use strict";
 
-const THRESHOLD_A = 8;
-function tetheredGetNumber(resolve, reject)  {
-  setTimeout(() => {
-    const randomInt = Date.now();
-    const value = randomInt % 10;
-    if(value < THRESHOLD_A) {
-      resolve(value);
-    } else {
-      reject(new RangeError(`Too large: ${value}`));
-    }
-  }, 500);
-}
+let promiseCount = 0;
 
-function determinParity(value) {
-  const isOdd = value % 2 === 1;
-  return {value, isOdd};
-} 
-
-function troubleWithGetNumber(reason) {
-  const err = new Error("Trouble Getting Number", {cause: reason});
-  console.error(err);
-  throw err;
-}
-
-function promisGetWord(parityInfo) {
-  return new Promise((resolve, reject) => {
-    const {value , isOdd} = parityInfo;
-    if(value <= THRESHOLD_A - 1) {
-      reject(new RangeError(`Still Too large: ${value}`));
-    } else {
-      parityInfo.wordEvenOdd = isOdd ? "odd" : "even";
-      resolve(parityInfo); 
-    }
+function testPromise() {
+  const thisPromiseCount = ++promiseCount;
+  const log = document.getElementById("log");
+  // begin
+  log.insertAdjacentHTML("beforeend", `${thisPromiseCount}) Started<br>`);
+  // We make a new promise: we promise a numeric count of this promise,
+  // starting from 1 (after waiting 3s)
+  const p1 = new Promise((resolve, reject) => {
+    // The executor function is called with the ability
+    // to resolve or reject the promise
+    log.insertAdjacentHTML(
+      "beforeend",
+      `${thisPromiseCount}) Promise constructor<br>`,
+    );
+    // This is only an example to create asynchronism
+    setTimeout(
+      () => {
+        // We fulfill the promise
+        resolve(thisPromiseCount);
+      },
+      Math.random() * 2000 + 1000,
+    );
   });
+
+  // We define what to do when the promise is resolved with the then() call,
+  // and what to do when the promise is rejected with the catch() call
+  p1.then((val) => {
+    // Log the fulfillment value
+    log.insertAdjacentHTML("beforeend", `${val}) Promise fulfilled<br>`);
+  }).catch((reason) => {
+    // Log the rejection reason
+    console.log(`Handle rejected promise (${reason}) here.`);
+  });
+  // end
+  log.insertAdjacentHTML("beforeend", `${thisPromiseCount}) Promise made<br>`);
 }
-new Promise(tetheredGetNumber)
-    .then(determinParity, troubleWithGetNumber)
-    .then(promisGetWord)
-    .then((info) => {
-      console.log(`Got: ${info.value}, ${info.wordEvenOdd}`);
-      return info;
-    })
-    .catch((reason) => {
-      if(reason.cause) {
-        console.log("Had Previusly Handled Error");
-      } else {
-        console.log(`Trouble with getPromiseWord(): ${reason}`);
-      }
-    })
-    .finally((info) => console.log("All done"));
+
+const btn = document.getElementById("make-promise");
+btn.addEventListener("click", testPromise);

@@ -1,7 +1,13 @@
-const foo = ["one", "two"];
+function drawChart({
+  size = "big",
+  coords = { x: 0, y: 0 },
+  radius = 25,
+} = {}) {
+  console.log(size, coords, radius);
+  // do some chart drawing
+}
 
-const[red, yellow, green, blue] = foo;
-console.log(red); // one 
-console.log(yellow); // two 
-console.log(green); // undefined 
-console.log(blue);  // undefined 
+drawChart({
+  coords: { x: 18, y: 30 },
+  radius: 30,
+});

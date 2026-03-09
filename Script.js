@@ -1,4 +1,7 @@
-const foo = {someFooProp: "Hi"};
+const myMap = new Map();
+myMap.set("JS", {name: "josh", desc: "I Maintain Things."});
 
-console.log(foo.someFooProp?.toUpperCase() ?? "not Available") // "Hi"
-console.log(foo.someBarProp?.toUpperCase() ?? "not Available")  // "not Available"
+const nameBar = myMap.get("CSS")?.name;
+
+
+console.log(nameBar);

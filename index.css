@@ -1,193 +1,173 @@
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-:root {
-  --bg: #0e0e12;
-  --surface: #18181f;
-  --surface2: #21212c;
-  --border: #2e2e3e;
-  --accent: #c8f060;
-  --accent-dim: #a4cc3e;
-  --text: #f0f0f0;
-  --text-muted: #888;
-  --operator: #ff6b6b;
-  --operator-dim: #cc4f4f;
-  --equals: var(--accent);
-  --radius: 14px;
-  --btn-radius: 10px;
+/* ── Reset & Variables ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0e0e12;--surface:#18181f;--surface2:#21212c;--surface3:#1a1a24;
+  --border:#2e2e3e;--border2:#3a3a50;
+  --accent:#c8f060;--accent2:#a0e030;
+  --text:#f0f0f0;--text-muted:#777;--text-dim:#aaa;
+  --red:#ff6b6b;--blue:#a0c8ff;--purple:#c4a0ff;
+  --radius:14px;--btn-r:10px;
+}
+body{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:var(--bg);font-family:'Syne',sans-serif;
+  background-image:radial-gradient(ellipse at 20% 50%,#1a2a0a18 0%,transparent 60%),
+    radial-gradient(ellipse at 80% 20%,#0a1a2a18 0%,transparent 60%);
+  padding:20px;
 }
 
-body {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--bg);
-  font-family: 'Syne', sans-serif;
-  background-image:
-    radial-gradient(ellipse at 20% 50%, #1a2a0a22 0%, transparent 60%),
-    radial-gradient(ellipse at 80% 20%, #0a1a2a22 0%, transparent 60%);
+/* ── App Shell ── */
+.app{display:flex;gap:16px;align-items:flex-start;max-width:760px;width:100%}
+
+/* ── Calculator Panel ── */
+.calc-panel{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:18px;width:340px;flex-shrink:0;
+  box-shadow:0 0 0 1px #ffffff06,0 24px 60px #00000070,0 0 40px #c8f06006;
 }
 
-.calc-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+/* ── Text Input ── */
+.expr-input-wrap{position:relative;margin-bottom:10px}
+.expr-input{
+  width:100%;background:var(--surface2);border:1px solid var(--border);
+  border-radius:10px;padding:10px 14px;
+  font-family:'Share Tech Mono',monospace;font-size:15px;
+  color:var(--text);outline:none;transition:border-color .15s;
+  caret-color:var(--accent);
 }
+.expr-input:focus{border-color:var(--accent);box-shadow:0 0 0 2px #c8f06018}
+.expr-input::placeholder{color:var(--text-muted)}
 
-.calc-label {
-  font-size: 11px;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  padding-left: 4px;
+/* ── Output Display ── */
+.output{
+  background:var(--surface2);border:1px solid var(--border);border-radius:10px;
+  padding:12px 14px;margin-bottom:12px;min-height:56px;
+  display:flex;flex-direction:column;justify-content:center;align-items:flex-end;gap:2px;
 }
+.output-label{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-muted);align-self:flex-start}
+.output-result{
+  font-family:'Share Tech Mono',monospace;font-size:26px;color:var(--accent);
+  line-height:1.1;word-break:break-all;text-align:right;transition:color .15s;
+}
+.output-result.is-error{color:var(--red);font-size:13px;text-align:right;line-height:1.4}
+.output-result.is-empty{color:var(--text-muted);font-size:18px}
 
-.calculator {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 20px;
-  width: 320px;
-  box-shadow:
-    0 0 0 1px #ffffff08,
-    0 30px 80px #00000080,
-    0 0 40px #c8f06008;
-}
+/* ── Button Rows ── */
+.sci-row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px}
+.const-row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px}
+.divider{height:1px;background:var(--border);margin:8px 0}
+.std-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 
-/* Display */
-.display {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 16px 18px 14px;
-  margin-bottom: 18px;
-  min-height: 90px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: flex-end;
-  gap: 6px;
-  overflow: hidden;
+/* ── Base Button ── */
+button{
+  font-family:'Syne',sans-serif;font-size:14px;font-weight:700;
+  padding:0;border:1px solid var(--border);border-radius:var(--btn-r);
+  cursor:pointer;transition:background .1s,transform .08s,color .1s;
+  position:relative;outline:none;letter-spacing:.01em;height:48px;
 }
+button::after{content:'';position:absolute;inset:0;border-radius:inherit;background:#fff;opacity:0;transition:opacity .15s}
+button:active::after{opacity:.05}
+button:active{transform:scale(.93)}
 
-.display .expression {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 13px;
-  color: var(--text-muted);
-  min-height: 18px;
-  word-break: break-all;
-  text-align: right;
-}
+button.sci{background:#1a1a28;color:var(--blue);border-color:#282840;font-size:12px;height:40px}
+button.sci:hover{background:#20203a;color:#c0dfff}
+button.const{background:#1a1a28;color:var(--purple);border-color:#282840;font-size:13px;height:40px}
+button.const:hover{background:#20203a;color:#d4b0ff}
+button.num{background:var(--surface2);color:var(--text)}
+button.num:hover{background:#272736}
+button.util{background:#222230;color:var(--accent);border-color:var(--border)}
+button.util:hover{background:#2a2a3a}
+button.op{background:#221818;color:var(--red);border-color:#341818}
+button.op:hover{background:#2c1c1c;color:#ff8888}
+button.eq{background:var(--accent);color:#0c1800;border-color:var(--accent);box-shadow:0 4px 18px #c8f06028;font-size:18px}
+button.eq:hover{background:#d4ff68;box-shadow:0 4px 24px #c8f06044}
+button.dot{background:var(--surface2);color:var(--accent)}
+button.dot:hover{background:#272736}
+button.span-2{grid-column:span 2}
 
-.display .result {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 36px;
-  color: var(--text);
-  line-height: 1;
-  word-break: break-all;
-  text-align: right;
-  transition: color 0.15s;
-}
+/* ── Right Panel ── */
+.right-panel{flex:1;display:flex;flex-direction:column;gap:14px;min-width:0}
 
-/* Buttons Grid */
-.buttons {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
+/* ── Section Card ── */
+.section{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:16px;
 }
+.section-title{
+  font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--text-muted);
+  margin-bottom:12px;display:flex;align-items:center;gap:8px;
+}
+.section-title::after{content:'';flex:1;height:1px;background:var(--border)}
 
-button {
-  font-family: 'Syne', sans-serif;
-  font-size: 17px;
-  font-weight: 700;
-  padding: 0;
-  height: 62px;
-  border: 1px solid var(--border);
-  border-radius: var(--btn-radius);
-  cursor: pointer;
-  transition: background 0.1s, transform 0.08s, box-shadow 0.1s, color 0.1s;
-  position: relative;
-  outline: none;
-  letter-spacing: 0.01em;
+/* Variable form */
+.var-form{display:flex;gap:6px;margin-bottom:6px}
+.var-form input{
+  background:var(--surface2);border:1px solid var(--border);border-radius:8px;
+  padding:8px 10px;font-family:'Share Tech Mono',monospace;font-size:13px;
+  color:var(--text);outline:none;transition:border-color .15s;flex:1;
 }
+.var-form input:focus{border-color:var(--accent)}
+.var-form input::placeholder{color:var(--text-muted);font-size:12px}
+.var-form .name-in{flex:0 0 80px}
+.btn-add{
+  background:var(--accent);color:#0c1800;border:none;border-radius:8px;
+  padding:0 14px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;
+  cursor:pointer;transition:background .1s,transform .08s;white-space:nowrap;height:36px;
+}
+.btn-add:hover{background:#d4ff68}
+.btn-add:active{transform:scale(.95)}
+.var-error{font-size:11px;color:var(--red);margin-bottom:6px;min-height:16px}
 
-/* Number buttons */
-button.num {
-  background: var(--surface2);
-  color: var(--text);
+/* Variable list */
+.var-list{display:flex;flex-direction:column;gap:4px;max-height:160px;overflow-y:auto}
+.var-item{
+  display:flex;align-items:center;gap:8px;background:var(--surface2);
+  border:1px solid var(--border);border-radius:8px;padding:6px 10px;
+  font-family:'Share Tech Mono',monospace;font-size:12px;cursor:pointer;
+  transition:border-color .15s;
 }
-button.num:hover { background: #2a2a38; }
-button.num:active { transform: scale(0.94); background: #32323f; }
+.var-item:hover{border-color:var(--purple)}
+.var-name{color:var(--purple);font-weight:700;flex:0 0 auto}
+.var-eq{color:var(--text-muted);margin:0 2px}
+.var-val{color:var(--text-dim);flex:1}
+.var-del{
+  margin-left:auto;background:none;border:none;color:var(--text-muted);
+  cursor:pointer;font-size:14px;padding:0 2px;line-height:1;transition:color .15s;height:auto;
+}
+.var-del:hover{color:var(--red)}
+.var-empty{font-size:12px;color:var(--text-muted);text-align:center;padding:8px 0}
 
-/* Utility: AC, +/-, % */
-button.util {
-  background: #252530;
-  color: var(--accent);
-  border-color: #2e2e3e;
+/* History */
+.history-list{display:flex;flex-direction:column;gap:4px;max-height:220px;overflow-y:auto}
+.hist-item{
+  background:var(--surface2);border:1px solid var(--border);border-radius:8px;
+  padding:8px 10px;cursor:pointer;transition:border-color .15s;
 }
-button.util:hover { background: #2d2d3d; }
-button.util:active { transform: scale(0.94); }
+.hist-item:hover{border-color:var(--accent)}
+.hist-expr{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-muted);word-break:break-all}
+.hist-result{font-family:'Share Tech Mono',monospace;font-size:15px;color:var(--accent);margin-top:2px}
+.hist-footer{display:flex;align-items:center;justify-content:flex-end;margin-top:6px}
+.hist-del{
+  background:none;border:none;color:var(--text-muted);cursor:pointer;
+  font-size:11px;padding:2px 4px;transition:color .15s;height:auto;
+}
+.hist-del:hover{color:var(--red)}
+.hist-empty{font-size:12px;color:var(--text-muted);text-align:center;padding:8px 0}
+.hist-clear{
+  background:none;border:1px solid var(--border);border-radius:6px;padding:3px 10px;
+  font-family:'Syne',sans-serif;font-size:11px;color:var(--text-muted);cursor:pointer;
+  transition:color .15s,border-color .15s;height:auto;
+}
+.hist-clear:hover{color:var(--red);border-color:var(--red)}
 
-/* Operator buttons */
-button.op {
-  background: #261a1a;
-  color: var(--operator);
-  border-color: #3a2222;
-}
-button.op:hover { background: #301e1e; color: #ff8080; border-color: #4a2828; }
-button.op:active { transform: scale(0.94); }
-button.op.active-op {
-  background: var(--operator);
-  color: #1a0808;
-  border-color: var(--operator);
-}
+/* Scrollbar */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
 
-/* Equals */
-button.eq {
-  background: var(--accent);
-  color: #0e1a00;
-  border-color: var(--accent);
-  box-shadow: 0 4px 20px #c8f06030;
+/* Responsive */
+@media(max-width:640px){
+  .app{flex-direction:column;align-items:center}
+  .calc-panel{width:100%;max-width:360px}
+  .right-panel{width:100%;max-width:360px}
 }
-button.eq:hover {
-  background: #d8ff70;
-  box-shadow: 0 4px 30px #c8f06055;
-}
-button.eq:active { transform: scale(0.94); box-shadow: none; }
-
-/* Span wide */
-button.span-2 { grid-column: span 2; }
-
-/* Dot */
-button.dot {
-  background: var(--surface2);
-  color: var(--accent);
-}
-button.dot:hover { background: #2a2a38; }
-button.dot:active { transform: scale(0.94); }
-
-/* Ripple effect placeholder */
-button::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: white;
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-button:active::after { opacity: 0.04; }
-
-/* Footer */
-.calc-footer {
-  display: flex;
-  justify-content: center;
-  gap: 6px;
-  margin-top: 14px;
-}
-.dot-ind {
-  width: 5px; height: 5px;
-  border-radius: 50%;
-  background: var(--border);
-}
-.dot-ind.active { background: var(--accent); }

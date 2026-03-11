@@ -1,331 +1,420 @@
-// ============================================================
-//  CALCULATOR JAVASCRIPT — fully explained step by step
-// ============================================================
+// ═══════════════════════════════════════════════════════════════
+//  CALCULATOR — Full-featured Expression Parser
+//  Features: text input, 4dp output, variables, constants,
+//            history, exception handling, keyboard support
+// ═══════════════════════════════════════════════════════════════
 
+// ── Constants (built-in, cannot be overridden) ───────────────
+const CONSTANTS = { pi: Math.PI, e: Math.E };
 
-// ------------------------------------------------------------
-// STEP 1: GRAB THE ELEMENTS FROM THE HTML
-// ------------------------------------------------------------
-// Before we can do anything, we need to get references to the
-// HTML elements we want to read from or update.
-// document.getElementById() finds an element by its id="..."
+// ── State ────────────────────────────────────────────────────
+let variables = {};   // { name: number }
+let history   = [];   // [{ id, expr, result }]
 
-const resultDisplay    = document.getElementById('result');      // big number display
-const expressionDisplay = document.getElementById('expression'); // small history line above
+// ── DOM refs ─────────────────────────────────────────────────
+const inputEl   = document.getElementById('expr-input');
+const outputEl  = document.getElementById('output');
+const varList   = document.getElementById('var-list');
+const varError  = document.getElementById('var-error');
+const varNameIn = document.getElementById('var-name');
+const varValIn  = document.getElementById('var-value');
+const histList  = document.getElementById('history-list');
 
-// Now grab every button using their IDs or classes
-const numButtons   = document.querySelectorAll('.num');   // all digit buttons (0-9)
-const btnAC        = document.getElementById('btn-ac');
-const btnSign      = document.getElementById('btn-sign');
-const btnPercent   = document.getElementById('btn-percent');
-const btnDivide    = document.getElementById('btn-divide');
-const btnMultiply  = document.getElementById('btn-multiply');
-const btnSubtract  = document.getElementById('btn-subtract');
-const btnAdd       = document.getElementById('btn-add');
-const btnDot       = document.getElementById('btn-dot');
-const btnEquals    = document.getElementById('btn-eq');
-
-
-// ------------------------------------------------------------
-// STEP 2: SET UP STATE VARIABLES
-// ------------------------------------------------------------
-// "State" means the data our calculator remembers at any moment.
-// We use regular variables to store this.
-
-let currentInput  = '0';   // what the user is currently typing  e.g. "42"
-let previousInput = '';    // the first number before an operator e.g. "10"
-let operator      = null;  // the chosen operator: '+', '-', '*', '/'
-let justCalculated = false; // did we just press '=' ? (explained later)
-
-
-// ------------------------------------------------------------
-// STEP 3: UPDATE THE DISPLAY
-// ------------------------------------------------------------
-// This is a helper function we'll call every time something
-// changes. It pushes our state variables onto the screen.
-
-function updateDisplay() {
-  resultDisplay.textContent = currentInput;
-
-  // Show "previousInput operator" in the small expression line
-  // e.g. "10 +" so the user remembers what they typed before
-  if (operator && previousInput !== '') {
-    expressionDisplay.textContent = previousInput + ' ' + operatorSymbol(operator);
-  } else {
-    expressionDisplay.textContent = '';
-  }
+// ═══════════════════════════════════════════════════════════════
+//  OUTPUT DISPLAY
+//  The text input is NEVER modified by the result — they are
+//  completely separate elements.
+// ═══════════════════════════════════════════════════════════════
+function setOutput(text, type = 'normal') {
+  outputEl.textContent = text;
+  outputEl.className   = 'output-result';
+  if (type === 'error') outputEl.classList.add('is-error');
+  if (type === 'empty') outputEl.classList.add('is-empty');
 }
 
-// Small helper: converts our internal operator symbol ('*', '/')
-// into the nicer display symbol ('×', '÷')
-function operatorSymbol(op) {
-  if (op === '*') return '×';
-  if (op === '/') return '÷';
-  return op; // '+' and '-' are already fine
+// ═══════════════════════════════════════════════════════════════
+//  TOKENIZER
+//  Converts a raw expression string into an array of tokens.
+//  e.g. "2*pi+sin(x)" → [2, '*', 3.14159, '+', 'sin', '(', 5, ')']
+//
+//  Whitespace is stripped first (requirement §2).
+//  Variables and constants are resolved to their numeric values here.
+// ═══════════════════════════════════════════════════════════════
+const FUNCS = ['sin', 'cos', 'tan', 'sqrt'];
+
+function tokenize(raw) {
+  const s = raw.replace(/\s+/g, '');  // strip ALL whitespace
+  if (!s) throw new Error('Empty expression');
+  const t = [];
+  let i = 0;
+
+  // Combine constants + user variables into one lookup table
+  const lookup = {};
+  Object.entries(CONSTANTS).forEach(([k, v]) => lookup[k.toLowerCase()] = v);
+  Object.entries(variables).forEach(([k, v]) => lookup[k.toLowerCase()] = Number(v));
+
+  while (i < s.length) {
+    const c = s[i];
+
+    // ── Numbers (integers and decimals) ──
+    if (/[0-9.]/.test(c)) {
+      let n = '';
+      while (i < s.length && /[0-9.]/.test(s[i])) n += s[i++];
+      if ((n.match(/\./g) || []).length > 1) throw new Error('Invalid number: "' + n + '"');
+      t.push(Number(n));
+      continue;
+    }
+
+    // ── Identifiers: function names, constants, or variables ──
+    if (/[a-z_]/i.test(c)) {
+      let n = '';
+      while (i < s.length && /[a-z0-9_]/i.test(s[i])) n += s[i++];
+      const nl = n.toLowerCase();
+      if (FUNCS.includes(nl))  { t.push(nl); continue; }       // function
+      if (nl in lookup)        { t.push(lookup[nl]); continue; } // constant or variable
+      throw new Error('Unknown identifier: "' + n + '"');
+    }
+
+    // ── Operators and parentheses ──
+    if ('+-*/^()'.includes(c)) {
+      const prev    = t[t.length - 1];
+      const afterOp = typeof prev === 'string' && !FUNCS.includes(prev) && '+-*/^'.includes(prev);
+      const isUnary = t.length === 0 || prev === '(' || afterOp || prev === 'UNARY_MINUS';
+      // A '-' in unary position means negation, not subtraction
+      t.push(c === '-' && isUnary ? 'UNARY_MINUS' : c);
+      i++;
+      continue;
+    }
+
+    throw new Error('Unexpected character: "' + c + '"');
+  }
+  return t;
 }
 
+// ═══════════════════════════════════════════════════════════════
+//  RECURSIVE DESCENT PARSER
+//  Each function handles one level of operator precedence,
+//  always calling the next-higher level first — this is what
+//  makes BODMAS / PEMDAS work automatically.
+//
+//  Precedence (lowest → highest):
+//    parseAddSub  →  + −
+//    parseMulDiv  →  * /
+//    parsePow     →  ^   (right-associative)
+//    parseUnary   →  unary −
+//    parsePrimary →  numbers, functions, ( )
+// ═══════════════════════════════════════════════════════════════
+let toks = [], pos = 0;
+const peek    = () => toks[pos];
+const consume = () => toks[pos++];
+const DEG     = Math.PI / 180;   // degree→radian conversion factor
 
-// ------------------------------------------------------------
-// STEP 4: HANDLE DIGIT BUTTON CLICKS  (0 – 9)
-// ------------------------------------------------------------
-
-function handleDigit(digit) {
-  // If the user just pressed '=' and now presses a digit,
-  // start fresh instead of appending to the result.
-  if (justCalculated) {
-    currentInput = digit;
-    justCalculated = false;
-    updateDisplay();
-    return; // stop here, don't run the rest of the function
-  }
-
-  // Don't allow more than 12 digits — keeps the display tidy
-  if (currentInput.replace('.', '').replace('-', '').length >= 12) return;
-
-  // If the display is just '0', replace it with the digit.
-  // Otherwise, append (stick) the digit onto the end.
-  if (currentInput === '0') {
-    currentInput = digit;
-  } else {
-    currentInput += digit;
-  }
-
-  updateDisplay();
+// Remove floating-point noise (e.g. sin(180) = 1.22e-16 → 0)
+// and guard against Infinity
+function cleanNum(n) {
+  if (!isFinite(n)) throw new Error('Result is ' + (n > 0 ? '+Infinity' : '-Infinity'));
+  return Math.abs(n) < 1e-10 ? 0 : parseFloat(n.toPrecision(10));
 }
 
-
-// ------------------------------------------------------------
-// STEP 5: HANDLE THE DECIMAL POINT ( . )
-// ------------------------------------------------------------
-
-function handleDot() {
-  // If we just finished a calculation, start a new decimal number
-  if (justCalculated) {
-    currentInput = '0.';
-    justCalculated = false;
-    updateDisplay();
-    return;
+function parseAddSub() {
+  let v = parseMulDiv();
+  while (peek() === '+' || peek() === '-') {
+    const op = consume(), r = parseMulDiv();
+    v = op === '+' ? v + r : v - r;
   }
-
-  // Only add a dot if there isn't one already
-  // e.g. we don't want "3.1.4"
-  if (!currentInput.includes('.')) {
-    currentInput += '.';
-    updateDisplay();
-  }
+  return v;
 }
 
-
-// ------------------------------------------------------------
-// STEP 6: HANDLE OPERATOR BUTTONS  ( + − × ÷ )
-// ------------------------------------------------------------
-
-function handleOperator(op) {
-  justCalculated = false;
-
-  // If the user presses TWO operators in a row (e.g. 5 + then ×),
-  // just swap the operator — don't calculate yet.
-  if (operator && currentInput === '') {
-    operator = op;
-    updateDisplay();
-    return;
+function parseMulDiv() {
+  let v = parsePow();
+  while (peek() === '*' || peek() === '/') {
+    const op = consume(), r = parsePow();
+    if (op === '/' && r === 0) throw new Error('Division by zero');
+    v = op === '*' ? v * r : v / r;
   }
-
-  // If there's already a pending calculation, finish it first.
-  // e.g. user typed: 5 + 3 ×  → calculate 5+3=8, then set operator to ×
-  if (operator && previousInput !== '') {
-    calculate();
-  }
-
-  // Save what's on screen as the "first number" and store the operator
-  previousInput = currentInput;
-  currentInput  = '';   // clear screen so user can type the second number
-  operator      = op;
-
-  updateDisplay();
+  return v;
 }
 
+function parsePow() {       // right-associative: 2^3^2 = 2^(3^2) = 512
+  let v = parseUnary();
+  if (peek() === '^') { consume(); v = Math.pow(v, parsePow()); }
+  return v;
+}
 
-// ------------------------------------------------------------
-// STEP 7: THE CORE CALCULATE FUNCTION
-// ------------------------------------------------------------
-// This is called when '=' is pressed, OR when chaining operators.
+function parseUnary() {
+  if (peek() === 'UNARY_MINUS') { consume(); return -parseUnary(); }
+  return parsePrimary();
+}
 
+function parsePrimary() {
+  const t = peek();
+  if (t === undefined) throw new Error('Incomplete expression — something is missing at the end');
+
+  // Plain number (or already-resolved variable/constant value)
+  if (typeof t === 'number') { consume(); return t; }
+
+  // Function call: sin(…) cos(…) tan(…) sqrt(…)
+  if (FUNCS.includes(t)) {
+    const fn = consume();
+    if (consume() !== '(') throw new Error('Expected "(" after ' + fn);
+    const arg = parseAddSub();
+    if (consume() !== ')') throw new Error('Expected ")" to close ' + fn + '(…)');
+    if (fn === 'sqrt') {
+      if (arg < 0) throw new Error('Cannot take √ of a negative number');
+      return cleanNum(Math.sqrt(arg));
+    }
+    if (fn === 'tan' && Math.abs(arg % 180) === 90)
+      throw new Error('tan(' + arg + '°) is undefined (vertical asymptote)');
+    const rad = arg * DEG;   // convert degrees → radians
+    if (fn === 'sin') return cleanNum(Math.sin(rad));
+    if (fn === 'cos') return cleanNum(Math.cos(rad));
+    if (fn === 'tan') return cleanNum(Math.tan(rad));
+  }
+
+  // Parenthesised sub-expression
+  if (t === '(') {
+    consume();
+    const v = parseAddSub();
+    if (consume() !== ')') throw new Error('Missing closing ")" — check your parentheses');
+    return v;
+  }
+
+  throw new Error('Unexpected "' + t + '" in expression');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  EVALUATE — main entry point
+// ═══════════════════════════════════════════════════════════════
+function evaluate(input) {
+  const s = input.trim();
+  if (!s) return null;
+  toks = tokenize(s);
+  pos  = 0;
+  const result = parseAddSub();
+  if (pos < toks.length)
+    throw new Error('Unexpected "' + toks[pos] + '" — check your expression');
+  return cleanNum(result);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  CALCULATE & UPDATE OUTPUT
+//  The text input is the single source of truth.
+//  Output display is always derived from it, never overriding it.
+// ═══════════════════════════════════════════════════════════════
 function calculate() {
-  // We need both numbers and an operator to do anything
-  if (operator === null || previousInput === '' || currentInput === '') return;
-
-  const a = parseFloat(previousInput); // convert string "10" → number 10
-  const b = parseFloat(currentInput);  // convert string "5"  → number 5
-  let result;
-
-  // Perform the right maths based on the stored operator
-  if (operator === '+') result = a + b;
-  if (operator === '-') result = a - b;
-  if (operator === '*') result = a * b;
-  if (operator === '/') {
-    // Special case: dividing by zero is not allowed
-    if (b === 0) {
-      currentInput  = 'Error';
-      previousInput = '';
-      operator      = null;
-      updateDisplay();
-      return;
-    }
-    result = a / b;
+  const raw = inputEl.value;
+  if (!raw.trim()) { setOutput('—', 'empty'); return; }
+  try {
+    const result = evaluate(raw);
+    const display = result.toFixed(4);   // fixed 4 decimal places (§3)
+    setOutput(display, 'normal');
+    addHistory(raw, display);
+  } catch (e) {
+    setOutput(e.message, 'error');
   }
-
-  // Floating point numbers can produce ugly results like 0.1 + 0.2 = 0.30000000000000004
-  // parseFloat(result.toPrecision(10)) cleans that up neatly
-  result = parseFloat(result.toPrecision(10));
-
-  // Put the result on screen and reset the operator/previous number
-  currentInput  = String(result);
-  previousInput = '';
-  operator      = null;
-  justCalculated = true; // remember we just finished a calculation
-
-  updateDisplay();
 }
 
-
-// ------------------------------------------------------------
-// STEP 8: HANDLE UTILITY BUTTONS  (AC, +/−, %)
-// ------------------------------------------------------------
-
-// AC = All Clear — reset everything back to the start
-function handleAC() {
-  currentInput   = '0';
-  previousInput  = '';
-  operator       = null;
-  justCalculated = false;
-  updateDisplay();
-}
-
-// +/− flips the sign of the current number
-// e.g. 5 → -5,  -3.2 → 3.2
-function handleSign() {
-  if (currentInput === '0' || currentInput === '') return;
-  if (currentInput.startsWith('-')) {
-    currentInput = currentInput.slice(1); // remove the leading minus
-  } else {
-    currentInput = '-' + currentInput;    // add a leading minus
-  }
-  updateDisplay();
-}
-
-// % converts the number to a percentage (divides by 100)
-// e.g. 75 → 0.75
-function handlePercent() {
-  if (currentInput === '' || currentInput === '0') return;
-  currentInput = String(parseFloat(currentInput) / 100);
-  updateDisplay();
-}
-
-
-// ------------------------------------------------------------
-// STEP 9: HIGHLIGHT THE ACTIVE OPERATOR BUTTON
-// ------------------------------------------------------------
-// When an operator is selected we give it a highlighted style
-// so the user can see which one is active.
-
-const opButtons = [btnDivide, btnMultiply, btnSubtract, btnAdd];
-
-function highlightOperator(activeBtn) {
-  // First remove highlight from ALL operator buttons
-  opButtons.forEach(btn => btn.classList.remove('active-op'));
-  // Then add it only to the one that was just pressed
-  if (activeBtn) activeBtn.classList.add('active-op');
-}
-
-// Remove the highlight once a calculation is done
-function clearOperatorHighlight() {
-  opButtons.forEach(btn => btn.classList.remove('active-op'));
-}
-
-
-// ------------------------------------------------------------
-// STEP 10: ATTACH EVENT LISTENERS
-// ------------------------------------------------------------
-// An event listener "listens" for a click and runs a function.
-// We now connect every button to the right handler function.
-
-// Digit buttons — loop through all of them and attach a click handler
-numButtons.forEach(btn => {
-  btn.addEventListener('click', () => {
-    handleDigit(btn.dataset.val); // dataset.val reads the data-val="..." in the HTML
-  });
-});
-
-// Decimal point
-btnDot.addEventListener('click', handleDot);
-
-// Utility buttons
-btnAC.addEventListener('click', () => {
-  handleAC();
-  clearOperatorHighlight();
-});
-btnSign.addEventListener('click', handleSign);
-btnPercent.addEventListener('click', handlePercent);
-
-// Operator buttons
-btnDivide.addEventListener('click', () => {
-  handleOperator('/');
-  highlightOperator(btnDivide);
-});
-btnMultiply.addEventListener('click', () => {
-  handleOperator('*');
-  highlightOperator(btnMultiply);
-});
-btnSubtract.addEventListener('click', () => {
-  handleOperator('-');
-  highlightOperator(btnSubtract);
-});
-btnAdd.addEventListener('click', () => {
-  handleOperator('+');
-  highlightOperator(btnAdd);
-});
-
-// Equals button
-btnEquals.addEventListener('click', () => {
+// ═══════════════════════════════════════════════════════════════
+//  BUTTON → INPUT  (insert text at the current cursor position)
+//  Buttons update the text input, not the output directly.
+// ═══════════════════════════════════════════════════════════════
+function insertAtCursor(text) {
+  const el    = inputEl;
+  const start = el.selectionStart ?? el.value.length;
+  const end   = el.selectionEnd   ?? el.value.length;
+  el.value    = el.value.slice(0, start) + text + el.value.slice(end);
+  const cur   = start + text.length;
+  el.selectionStart = el.selectionEnd = cur;
+  el.focus();
   calculate();
-  clearOperatorHighlight();
-});
+}
 
+function handleAC() {
+  inputEl.value = '';
+  setOutput('—', 'empty');
+  inputEl.focus();
+}
 
-// ------------------------------------------------------------
-// STEP 11: KEYBOARD SUPPORT  (bonus!)
-// ------------------------------------------------------------
-// This lets users type on their keyboard as well as click buttons.
-// 'keydown' fires whenever a key is pressed.
-
-document.addEventListener('keydown', (event) => {
-  const key = event.key;
-
-  if (key >= '0' && key <= '9') handleDigit(key);
-  if (key === '.')               handleDot();
-  if (key === '+')             { handleOperator('+'); highlightOperator(btnAdd); }
-  if (key === '-')             { handleOperator('-'); highlightOperator(btnSubtract); }
-  if (key === '*')             { handleOperator('*'); highlightOperator(btnMultiply); }
-  if (key === '/')             { event.preventDefault(); handleOperator('/'); highlightOperator(btnDivide); }
-  if (key === 'Enter' || key === '=') { calculate(); clearOperatorHighlight(); }
-  if (key === 'Escape')        { handleAC(); clearOperatorHighlight(); }
-  if (key === 'Backspace') {
-    // Delete the last character when Backspace is pressed
-    if (currentInput.length > 1) {
-      currentInput = currentInput.slice(0, -1);
-    } else {
-      currentInput = '0';
-    }
-    updateDisplay();
+function handleBackspace() {
+  const el    = inputEl;
+  const start = el.selectionStart;
+  const end   = el.selectionEnd;
+  if (start !== end) {
+    // Delete selected text
+    el.value = el.value.slice(0, start) + el.value.slice(end);
+    el.selectionStart = el.selectionEnd = start;
+  } else if (start > 0) {
+    // Smart backspace: remove whole function+paren token if cursor is right after it
+    const before = el.value.slice(0, start);
+    const m = before.match(/(sqrt\(|sin\(|cos\(|tan\()$/);
+    const del = m ? m[0].length : 1;
+    el.value = before.slice(0, -del) + el.value.slice(end);
+    el.selectionStart = el.selectionEnd = start - del;
   }
+  el.focus();
+  calculate();
+}
+
+function handleSign() {
+  const v = inputEl.value.trim();
+  if (!v) return;
+  inputEl.value = (v.startsWith('-(') && v.endsWith(')')) ? v.slice(2, -1) : '-(' + v + ')';
+  calculate();
+  inputEl.focus();
+}
+
+function handlePercent() {
+  const v = inputEl.value.trim();
+  if (!v) return;
+  inputEl.value = '(' + v + ')/100';
+  calculate();
+  inputEl.focus();
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  VARIABLES
+// ═══════════════════════════════════════════════════════════════
+// Reserved names: constants + function names cannot be used as variables
+const RESERVED = new Set(['pi', 'e', 'sin', 'cos', 'tan', 'sqrt']);
+
+function addVariable() {
+  const name  = varNameIn.value.trim();
+  const value = varValIn.value.trim();
+  varError.textContent = '';
+
+  if (!name)
+    return showVarError('Variable name cannot be empty');
+  if (!/^[a-z_][a-z0-9_]*$/i.test(name))
+    return showVarError('Name must start with a letter; only letters, digits, and _ allowed');
+  if (RESERVED.has(name.toLowerCase()))
+    return showVarError('"' + name + '" is a reserved name (constant or function)');
+  if (!value)
+    return showVarError('Value cannot be empty');
+  const num = Number(value);
+  if (isNaN(num))
+    return showVarError('"' + value + '" is not a valid number');
+
+  variables[name.toLowerCase()] = num;
+  varNameIn.value = '';
+  varValIn.value  = '';
+  renderVarList();
+  calculate();           // re-evaluate current expression with new variable
+  varNameIn.focus();
+}
+
+function showVarError(msg) { varError.textContent = msg; }
+
+function deleteVariable(name) {
+  delete variables[name.toLowerCase()];
+  renderVarList();
+  calculate();
+}
+
+function insertVarName(name) { insertAtCursor(name); }
+
+function renderVarList() {
+  const keys = Object.keys(variables);
+  if (!keys.length) {
+    varList.innerHTML = '<div class="var-empty">No variables yet</div>';
+    return;
+  }
+  varList.innerHTML = keys.map(k => `
+    <div class="var-item" title="Click to insert '${k}'" onclick="insertVarName('${k}')">
+      <span class="var-name">${escHtml(k)}</span>
+      <span class="var-eq">=</span>
+      <span class="var-val">${escHtml(String(variables[k]))}</span>
+      <button class="var-del" title="Delete" onclick="event.stopPropagation();deleteVariable('${k}')">✕</button>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  HISTORY
+// ═══════════════════════════════════════════════════════════════
+function addHistory(expr, result) {
+  // Avoid duplicate consecutive entries
+  if (history.length && history[0].expr === expr && history[0].result === result) return;
+  history.unshift({ id: Date.now(), expr, result });
+  if (history.length > 50) history.pop();  // cap at 50 items
+  renderHistory();
+}
+
+function deleteHistory(id) {
+  history = history.filter(h => h.id !== id);
+  renderHistory();
+}
+
+function clearHistory() {
+  history = [];
+  renderHistory();
+}
+
+// Load a history expression back into the text input
+function loadHistory(expr) {
+  inputEl.value = expr;
+  inputEl.focus();
+  calculate();
+}
+
+function renderHistory() {
+  if (!history.length) {
+    histList.innerHTML = '<div class="hist-empty">No history yet</div>';
+    return;
+  }
+  histList.innerHTML = history.map(h => `
+    <div class="hist-item" title="Click to load" onclick="loadHistory(${JSON.stringify(h.expr)})">
+      <div class="hist-expr">${escHtml(h.expr)}</div>
+      <div class="hist-result">= ${escHtml(h.result)}</div>
+      <div class="hist-footer">
+        <button class="hist-del" title="Remove" onclick="event.stopPropagation();deleteHistory(${h.id})">✕ remove</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// Prevent XSS in dynamically rendered content
+function escHtml(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  EVENT LISTENERS
+// ═══════════════════════════════════════════════════════════════
+
+// Live evaluation as the user types directly
+inputEl.addEventListener('input', calculate);
+inputEl.addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); calculate(); }
 });
 
+// Digit buttons
+document.querySelectorAll('.num')
+  .forEach(b => b.addEventListener('click', () => insertAtCursor(b.dataset.val)));
 
-// ------------------------------------------------------------
-// STEP 12: INITIALISE
-// ------------------------------------------------------------
-// Run updateDisplay once when the page loads so the screen
-// shows '0' right away instead of being blank.
+// All data-insert buttons (operators, sci, constants, parens, dot)
+document.querySelectorAll('[data-insert]')
+  .forEach(b => b.addEventListener('click', () => insertAtCursor(b.dataset.insert)));
 
-updateDisplay();
+// Special buttons
+document.getElementById('btn-ac').addEventListener('click', handleAC);
+document.getElementById('btn-backspace').addEventListener('click', handleBackspace);
+document.getElementById('btn-sign').addEventListener('click', handleSign);
+document.getElementById('btn-percent').addEventListener('click', handlePercent);
+document.getElementById('btn-eq').addEventListener('click', calculate);
+
+// Variable form
+document.getElementById('btn-add-var').addEventListener('click', addVariable);
+varNameIn.addEventListener('keydown', e => { if (e.key === 'Enter') varValIn.focus(); });
+varValIn.addEventListener('keydown',  e => { if (e.key === 'Enter') addVariable(); });
+
+// History clear
+document.getElementById('btn-clear-hist').addEventListener('click', clearHistory);
+
+// ═══════════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════════
+renderVarList();
+renderHistory();
+inputEl.focus();

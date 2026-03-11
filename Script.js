@@ -1,120 +1,103 @@
-// ═══════════════════════════════════════════════════════════════
-//  CALCULATOR — Full-featured Expression Parser
-//  Features: text input, 4dp output, variables, constants,
-//            history, exception handling, keyboard support
-// ═══════════════════════════════════════════════════════════════
-
-// ── Constants (built-in, cannot be overridden) ───────────────
+// ═══════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════
 const CONSTANTS = { pi: Math.PI, e: Math.E };
-
-// ── State ────────────────────────────────────────────────────
 let variables = {};   // { name: number }
 let history   = [];   // [{ id, expr, result }]
 
-// ── DOM refs ─────────────────────────────────────────────────
-const inputEl   = document.getElementById('expr-input');
-const outputEl  = document.getElementById('output');
-const varList   = document.getElementById('var-list');
-const varError  = document.getElementById('var-error');
-const varNameIn = document.getElementById('var-name');
-const varValIn  = document.getElementById('var-value');
-const histList  = document.getElementById('history-list');
+// ═══════════════════════════════════════════════
+//  DOM REFS
+// ═══════════════════════════════════════════════
+const inputEl    = document.getElementById('expr-input');
+const outputEl   = document.getElementById('output');
+const varListEl  = document.getElementById('var-list');
+const varErrorEl = document.getElementById('var-error');
+const varNameIn  = document.getElementById('var-name');
+const varValIn   = document.getElementById('var-val');
+const histListEl = document.getElementById('hist-list');
 
-// ═══════════════════════════════════════════════════════════════
-//  OUTPUT DISPLAY
-//  The text input is NEVER modified by the result — they are
-//  completely separate elements.
-// ═══════════════════════════════════════════════════════════════
-function setOutput(text, type = 'normal') {
+// ═══════════════════════════════════════════════
+//  OUTPUT  (never touches the input field)
+// ═══════════════════════════════════════════════
+function setOutput(text, type = 'ok') {
   outputEl.textContent = text;
-  outputEl.className   = 'output-result';
-  if (type === 'error') outputEl.classList.add('is-error');
-  if (type === 'empty') outputEl.classList.add('is-empty');
+  outputEl.className = 'result-value';
+  if (type === 'empty') outputEl.classList.add('empty');
+  if (type === 'error') outputEl.classList.add('error');
 }
 
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════
 //  TOKENIZER
-//  Converts a raw expression string into an array of tokens.
-//  e.g. "2*pi+sin(x)" → [2, '*', 3.14159, '+', 'sin', '(', 5, ')']
-//
-//  Whitespace is stripped first (requirement §2).
-//  Variables and constants are resolved to their numeric values here.
-// ═══════════════════════════════════════════════════════════════
-const FUNCS = ['sin', 'cos', 'tan', 'sqrt'];
+//  Strips whitespace, resolves identifiers,
+//  returns array of tokens.
+// ═══════════════════════════════════════════════
+const FUNCS = ['sin','cos','tan','sqrt'];
 
 function tokenize(raw) {
-  const s = raw.replace(/\s+/g, '');  // strip ALL whitespace
+  const s = raw.replace(/\s+/g, '');
   if (!s) throw new Error('Empty expression');
-  const t = [];
+  const tokens = [];
   let i = 0;
 
-  // Combine constants + user variables into one lookup table
+  // Build combined lookup: constants + user variables
   const lookup = {};
-  Object.entries(CONSTANTS).forEach(([k, v]) => lookup[k.toLowerCase()] = v);
-  Object.entries(variables).forEach(([k, v]) => lookup[k.toLowerCase()] = Number(v));
+  for (const [k,v] of Object.entries(CONSTANTS)) lookup[k] = v;
+  for (const [k,v] of Object.entries(variables))  lookup[k] = Number(v);
 
   while (i < s.length) {
     const c = s[i];
 
-    // ── Numbers (integers and decimals) ──
+    // ── Number ──
     if (/[0-9.]/.test(c)) {
       let n = '';
       while (i < s.length && /[0-9.]/.test(s[i])) n += s[i++];
-      if ((n.match(/\./g) || []).length > 1) throw new Error('Invalid number: "' + n + '"');
-      t.push(Number(n));
+      if ((n.match(/\./g)||[]).length > 1)
+        throw new Error('Invalid number "' + n + '"');
+      tokens.push(Number(n));
       continue;
     }
 
-    // ── Identifiers: function names, constants, or variables ──
+    // ── Identifier: function / constant / variable ──
     if (/[a-z_]/i.test(c)) {
-      let n = '';
-      while (i < s.length && /[a-z0-9_]/i.test(s[i])) n += s[i++];
-      const nl = n.toLowerCase();
-      if (FUNCS.includes(nl))  { t.push(nl); continue; }       // function
-      if (nl in lookup)        { t.push(lookup[nl]); continue; } // constant or variable
-      throw new Error('Unknown identifier: "' + n + '"');
+      let id = '';
+      while (i < s.length && /[a-z0-9_]/i.test(s[i])) id += s[i++];
+      const key = id.toLowerCase();
+      if (FUNCS.includes(key))  { tokens.push(key); continue; }
+      if (key in lookup)        { tokens.push(lookup[key]); continue; }
+      throw new Error('Unknown identifier "' + id + '"');
     }
 
-    // ── Operators and parentheses ──
+    // ── Operator / parenthesis ──
     if ('+-*/^()'.includes(c)) {
-      const prev    = t[t.length - 1];
-      const afterOp = typeof prev === 'string' && !FUNCS.includes(prev) && '+-*/^'.includes(prev);
-      const isUnary = t.length === 0 || prev === '(' || afterOp || prev === 'UNARY_MINUS';
-      // A '-' in unary position means negation, not subtraction
-      t.push(c === '-' && isUnary ? 'UNARY_MINUS' : c);
+      const prev    = tokens[tokens.length - 1];
+      const prevIsOp = typeof prev === 'string' && !FUNCS.includes(prev) && '+-*/^'.includes(prev);
+      const isUnary  = tokens.length === 0 || prev === '(' || prevIsOp || prev === 'U-';
+      tokens.push(c === '-' && isUnary ? 'U-' : c);
       i++;
       continue;
     }
 
-    throw new Error('Unexpected character: "' + c + '"');
+    throw new Error('Unexpected character "' + c + '"');
   }
-  return t;
+  return tokens;
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  RECURSIVE DESCENT PARSER
-//  Each function handles one level of operator precedence,
-//  always calling the next-higher level first — this is what
-//  makes BODMAS / PEMDAS work automatically.
-//
-//  Precedence (lowest → highest):
-//    parseAddSub  →  + −
-//    parseMulDiv  →  * /
-//    parsePow     →  ^   (right-associative)
-//    parseUnary   →  unary −
-//    parsePrimary →  numbers, functions, ( )
-// ═══════════════════════════════════════════════════════════════
-let toks = [], pos = 0;
-const peek    = () => toks[pos];
-const consume = () => toks[pos++];
-const DEG     = Math.PI / 180;   // degree→radian conversion factor
+// ═══════════════════════════════════════════════
+//  PARSER  (Recursive Descent)
+//  Precedence: AddSub < MulDiv < Pow < Unary < Primary
+// ═══════════════════════════════════════════════
+let T = [], P = 0;
+const peek    = () => T[P];
+const consume = () => T[P++];
+const RAD     = Math.PI / 180;
 
-// Remove floating-point noise (e.g. sin(180) = 1.22e-16 → 0)
-// and guard against Infinity
-function cleanNum(n) {
-  if (!isFinite(n)) throw new Error('Result is ' + (n > 0 ? '+Infinity' : '-Infinity'));
+// Round out floating-point dust (e.g. sin(180) → 0 not 1.22e-16)
+function tidy(n) {
+  if (!isFinite(n)) throw new Error('Result is ' + (n > 0 ? '∞' : '-∞'));
   return Math.abs(n) < 1e-10 ? 0 : parseFloat(n.toPrecision(10));
 }
+
+function parseExpr()   { return parseAddSub(); }
 
 function parseAddSub() {
   let v = parseMulDiv();
@@ -135,14 +118,14 @@ function parseMulDiv() {
   return v;
 }
 
-function parsePow() {       // right-associative: 2^3^2 = 2^(3^2) = 512
+function parsePow() {         // right-associative: 2^3^2 = 2^(3^2)
   let v = parseUnary();
   if (peek() === '^') { consume(); v = Math.pow(v, parsePow()); }
   return v;
 }
 
 function parseUnary() {
-  if (peek() === 'UNARY_MINUS') { consume(); return -parseUnary(); }
+  if (peek() === 'U-') { consume(); return -parseUnary(); }
   return parsePrimary();
 }
 
@@ -150,31 +133,32 @@ function parsePrimary() {
   const t = peek();
   if (t === undefined) throw new Error('Incomplete expression — something is missing at the end');
 
-  // Plain number (or already-resolved variable/constant value)
+  // Plain number (already-resolved variable / constant)
   if (typeof t === 'number') { consume(); return t; }
 
-  // Function call: sin(…) cos(…) tan(…) sqrt(…)
+  // Function call
   if (FUNCS.includes(t)) {
     const fn = consume();
     if (consume() !== '(') throw new Error('Expected "(" after ' + fn);
-    const arg = parseAddSub();
+    const arg = parseExpr();
     if (consume() !== ')') throw new Error('Expected ")" to close ' + fn + '(…)');
+
     if (fn === 'sqrt') {
       if (arg < 0) throw new Error('Cannot take √ of a negative number');
-      return cleanNum(Math.sqrt(arg));
+      return tidy(Math.sqrt(arg));
     }
     if (fn === 'tan' && Math.abs(arg % 180) === 90)
-      throw new Error('tan(' + arg + '°) is undefined (vertical asymptote)');
-    const rad = arg * DEG;   // convert degrees → radians
-    if (fn === 'sin') return cleanNum(Math.sin(rad));
-    if (fn === 'cos') return cleanNum(Math.cos(rad));
-    if (fn === 'tan') return cleanNum(Math.tan(rad));
+      throw new Error('tan(' + arg + '°) is undefined');
+    const rad = arg * RAD;
+    if (fn === 'sin') return tidy(Math.sin(rad));
+    if (fn === 'cos') return tidy(Math.cos(rad));
+    if (fn === 'tan') return tidy(Math.tan(rad));
   }
 
-  // Parenthesised sub-expression
+  // Parenthesised group
   if (t === '(') {
     consume();
-    const v = parseAddSub();
+    const v = parseExpr();
     if (consume() !== ')') throw new Error('Missing closing ")" — check your parentheses');
     return v;
   }
@@ -182,49 +166,44 @@ function parsePrimary() {
   throw new Error('Unexpected "' + t + '" in expression');
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  EVALUATE — main entry point
-// ═══════════════════════════════════════════════════════════════
-function evaluate(input) {
-  const s = input.trim();
+// ═══════════════════════════════════════════════
+//  EVALUATE
+// ═══════════════════════════════════════════════
+function evaluate(raw) {
+  const s = raw.trim();
   if (!s) return null;
-  toks = tokenize(s);
-  pos  = 0;
-  const result = parseAddSub();
-  if (pos < toks.length)
-    throw new Error('Unexpected "' + toks[pos] + '" — check your expression');
-  return cleanNum(result);
+  T = tokenize(s);
+  P = 0;
+  const result = parseExpr();
+  if (P < T.length) throw new Error('Unexpected "' + T[P] + '" — check your expression');
+  return tidy(result);
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  CALCULATE & UPDATE OUTPUT
-//  The text input is the single source of truth.
-//  Output display is always derived from it, never overriding it.
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════
+//  CALCULATE — reads input, writes output only
+// ═══════════════════════════════════════════════
 function calculate() {
   const raw = inputEl.value;
   if (!raw.trim()) { setOutput('—', 'empty'); return; }
   try {
-    const result = evaluate(raw);
-    const display = result.toFixed(4);   // fixed 4 decimal places (§3)
-    setOutput(display, 'normal');
+    const num     = evaluate(raw);
+    const display = num.toFixed(4);   // always 4 decimal places
+    setOutput(display, 'ok');
     addHistory(raw, display);
   } catch (e) {
     setOutput(e.message, 'error');
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  BUTTON → INPUT  (insert text at the current cursor position)
-//  Buttons update the text input, not the output directly.
-// ═══════════════════════════════════════════════════════════════
-function insertAtCursor(text) {
-  const el    = inputEl;
-  const start = el.selectionStart ?? el.value.length;
-  const end   = el.selectionEnd   ?? el.value.length;
-  el.value    = el.value.slice(0, start) + text + el.value.slice(end);
-  const cur   = start + text.length;
-  el.selectionStart = el.selectionEnd = cur;
+// ═══════════════════════════════════════════════
+//  BUTTON → INPUT  (insert at cursor)
+// ═══════════════════════════════════════════════
+function insertAt(text) {
+  const el  = inputEl;
+  const s   = el.selectionStart ?? el.value.length;
+  const e   = el.selectionEnd   ?? el.value.length;
+  el.value  = el.value.slice(0, s) + text + el.value.slice(e);
+  el.selectionStart = el.selectionEnd = s + text.length;
   el.focus();
   calculate();
 }
@@ -235,21 +214,19 @@ function handleAC() {
   inputEl.focus();
 }
 
-function handleBackspace() {
-  const el    = inputEl;
-  const start = el.selectionStart;
-  const end   = el.selectionEnd;
-  if (start !== end) {
-    // Delete selected text
-    el.value = el.value.slice(0, start) + el.value.slice(end);
-    el.selectionStart = el.selectionEnd = start;
-  } else if (start > 0) {
-    // Smart backspace: remove whole function+paren token if cursor is right after it
-    const before = el.value.slice(0, start);
+function handleBS() {
+  const el = inputEl;
+  const s  = el.selectionStart, e = el.selectionEnd;
+  if (s !== e) {
+    el.value = el.value.slice(0, s) + el.value.slice(e);
+    el.selectionStart = el.selectionEnd = s;
+  } else if (s > 0) {
+    // Smart delete: remove whole function token if cursor is right after it
+    const before = el.value.slice(0, s);
     const m = before.match(/(sqrt\(|sin\(|cos\(|tan\()$/);
     const del = m ? m[0].length : 1;
-    el.value = before.slice(0, -del) + el.value.slice(end);
-    el.selectionStart = el.selectionEnd = start - del;
+    el.value = before.slice(0, -del) + el.value.slice(e);
+    el.selectionStart = el.selectionEnd = s - del;
   }
   el.focus();
   calculate();
@@ -258,98 +235,86 @@ function handleBackspace() {
 function handleSign() {
   const v = inputEl.value.trim();
   if (!v) return;
-  inputEl.value = (v.startsWith('-(') && v.endsWith(')')) ? v.slice(2, -1) : '-(' + v + ')';
-  calculate();
-  inputEl.focus();
+  inputEl.value = (v.startsWith('-(') && v.endsWith(')')) ? v.slice(2,-1) : '-(' + v + ')';
+  calculate(); inputEl.focus();
 }
 
-function handlePercent() {
+function handlePct() {
   const v = inputEl.value.trim();
   if (!v) return;
   inputEl.value = '(' + v + ')/100';
-  calculate();
-  inputEl.focus();
+  calculate(); inputEl.focus();
 }
 
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════
 //  VARIABLES
-// ═══════════════════════════════════════════════════════════════
-// Reserved names: constants + function names cannot be used as variables
-const RESERVED = new Set(['pi', 'e', 'sin', 'cos', 'tan', 'sqrt']);
+// ═══════════════════════════════════════════════
+const RESERVED = new Set(['pi','e','sin','cos','tan','sqrt']);
 
 function addVariable() {
   const name  = varNameIn.value.trim();
   const value = varValIn.value.trim();
-  varError.textContent = '';
+  varErrorEl.textContent = '';
 
   if (!name)
-    return showVarError('Variable name cannot be empty');
+    return (varErrorEl.textContent = 'Name cannot be empty');
   if (!/^[a-z_][a-z0-9_]*$/i.test(name))
-    return showVarError('Name must start with a letter; only letters, digits, and _ allowed');
+    return (varErrorEl.textContent = 'Name: letters, digits, _ only; must start with a letter');
   if (RESERVED.has(name.toLowerCase()))
-    return showVarError('"' + name + '" is a reserved name (constant or function)');
+    return (varErrorEl.textContent = '"' + name + '" is reserved (constant or function)');
   if (!value)
-    return showVarError('Value cannot be empty');
+    return (varErrorEl.textContent = 'Value cannot be empty');
   const num = Number(value);
   if (isNaN(num))
-    return showVarError('"' + value + '" is not a valid number');
+    return (varErrorEl.textContent = '"' + value + '" is not a valid number');
 
   variables[name.toLowerCase()] = num;
-  varNameIn.value = '';
-  varValIn.value  = '';
+  varNameIn.value = varValIn.value = '';
   renderVarList();
-  calculate();           // re-evaluate current expression with new variable
+  calculate();
   varNameIn.focus();
 }
 
-function showVarError(msg) { varError.textContent = msg; }
-
-function deleteVariable(name) {
-  delete variables[name.toLowerCase()];
+function deleteVar(name) {
+  delete variables[name];
   renderVarList();
   calculate();
 }
 
-function insertVarName(name) { insertAtCursor(name); }
-
 function renderVarList() {
   const keys = Object.keys(variables);
   if (!keys.length) {
-    varList.innerHTML = '<div class="var-empty">No variables yet</div>';
+    varListEl.innerHTML = '<div class="empty-msg">No variables yet</div>';
     return;
   }
-  varList.innerHTML = keys.map(k => `
-    <div class="var-item" title="Click to insert '${k}'" onclick="insertVarName('${k}')">
-      <span class="var-name">${escHtml(k)}</span>
-      <span class="var-eq">=</span>
-      <span class="var-val">${escHtml(String(variables[k]))}</span>
-      <button class="var-del" title="Delete" onclick="event.stopPropagation();deleteVariable('${k}')">✕</button>
+  varListEl.innerHTML = keys.map(k => `
+    <div class="var-row" title="Click to insert '${esc(k)}'" onclick="insertAt('${esc(k)}')">
+      <span class="var-row-name">${esc(k)}</span>
+      <span class="var-row-eq">=</span>
+      <span class="var-row-val">${esc(String(variables[k]))}</span>
+      <button class="var-row-del" title="Delete" onclick="event.stopPropagation();deleteVar('${esc(k)}')">✕</button>
     </div>
   `).join('');
 }
 
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════
 //  HISTORY
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════
 function addHistory(expr, result) {
-  // Avoid duplicate consecutive entries
+  // Skip duplicate of most-recent entry
   if (history.length && history[0].expr === expr && history[0].result === result) return;
   history.unshift({ id: Date.now(), expr, result });
-  if (history.length > 50) history.pop();  // cap at 50 items
+  if (history.length > 50) history.pop();
   renderHistory();
 }
 
-function deleteHistory(id) {
+function deleteHist(id) {
   history = history.filter(h => h.id !== id);
   renderHistory();
 }
 
-function clearHistory() {
-  history = [];
-  renderHistory();
-}
+function clearHistory() { history = []; renderHistory(); }
 
-// Load a history expression back into the text input
 function loadHistory(expr) {
   inputEl.value = expr;
   inputEl.focus();
@@ -358,63 +323,65 @@ function loadHistory(expr) {
 
 function renderHistory() {
   if (!history.length) {
-    histList.innerHTML = '<div class="hist-empty">No history yet</div>';
+    histListEl.innerHTML = '<div class="empty-msg">No history yet</div>';
     return;
   }
-  histList.innerHTML = history.map(h => `
-    <div class="hist-item" title="Click to load" onclick="loadHistory(${JSON.stringify(h.expr)})">
-      <div class="hist-expr">${escHtml(h.expr)}</div>
-      <div class="hist-result">= ${escHtml(h.result)}</div>
-      <div class="hist-footer">
-        <button class="hist-del" title="Remove" onclick="event.stopPropagation();deleteHistory(${h.id})">✕ remove</button>
+  histListEl.innerHTML = history.map(h => `
+    <div class="hist-card" title="Click to reload expression"
+         onclick="loadHistory(${JSON.stringify(h.expr)})">
+      <div class="hist-card-expr">${esc(h.expr)}</div>
+      <div class="hist-card-result">= ${esc(h.result)}</div>
+      <div class="hist-card-foot">
+        <button class="hist-card-del"
+                onclick="event.stopPropagation();deleteHist(${h.id})">✕ remove</button>
       </div>
     </div>
   `).join('');
 }
 
-// Prevent XSS in dynamically rendered content
-function escHtml(s) {
+// XSS-safe HTML escaping
+function esc(s) {
   return String(s)
     .replace(/&/g,'&amp;').replace(/</g,'&lt;')
     .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════
 //  EVENT LISTENERS
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════
 
-// Live evaluation as the user types directly
+// Live evaluation on every keystroke in the text input
 inputEl.addEventListener('input', calculate);
 inputEl.addEventListener('keydown', e => {
   if (e.key === 'Enter') { e.preventDefault(); calculate(); }
 });
 
 // Digit buttons
-document.querySelectorAll('.num')
-  .forEach(b => b.addEventListener('click', () => insertAtCursor(b.dataset.val)));
+document.querySelectorAll('.num-btn')
+  .forEach(b => b.addEventListener('click', () => insertAt(b.dataset.val)));
 
-// All data-insert buttons (operators, sci, constants, parens, dot)
+// All data-insert buttons (operators, sci, constants, dot, parens)
 document.querySelectorAll('[data-insert]')
-  .forEach(b => b.addEventListener('click', () => insertAtCursor(b.dataset.insert)));
+  .forEach(b => b.addEventListener('click', () => insertAt(b.dataset.insert)));
 
 // Special buttons
-document.getElementById('btn-ac').addEventListener('click', handleAC);
-document.getElementById('btn-backspace').addEventListener('click', handleBackspace);
+document.getElementById('btn-ac') .addEventListener('click', handleAC);
+document.getElementById('btn-bs') .addEventListener('click', handleBS);
 document.getElementById('btn-sign').addEventListener('click', handleSign);
-document.getElementById('btn-percent').addEventListener('click', handlePercent);
-document.getElementById('btn-eq').addEventListener('click', calculate);
+document.getElementById('btn-pct') .addEventListener('click', handlePct);
+document.getElementById('btn-eq')  .addEventListener('click', calculate);
 
 // Variable form
 document.getElementById('btn-add-var').addEventListener('click', addVariable);
-varNameIn.addEventListener('keydown', e => { if (e.key === 'Enter') varValIn.focus(); });
-varValIn.addEventListener('keydown',  e => { if (e.key === 'Enter') addVariable(); });
+varNameIn.addEventListener('keydown', e => { if(e.key==='Enter') varValIn.focus(); });
+varValIn .addEventListener('keydown', e => { if(e.key==='Enter') addVariable(); });
 
-// History clear
+// History
 document.getElementById('btn-clear-hist').addEventListener('click', clearHistory);
 
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════
 //  INIT
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════
 renderVarList();
 renderHistory();
 inputEl.focus();

@@ -10,95 +10,99 @@
 <body>
 <div class="app">
 
-  <!-- ══ CALCULATOR PANEL ══ -->
+  <!-- ════════ CALCULATOR ════════ -->
   <div class="calc-panel">
 
-    <!-- Editable Text Input -->
-    <div class="expr-input-wrap">
-      <input type="text" class="expr-input" id="expr-input"
-             placeholder="Type an expression…" autocomplete="off" spellcheck="false"/>
+    <!-- Editable expression input -->
+    <input type="text" id="expr-input" class="expr-input"
+           placeholder="Type an expression…"
+           autocomplete="off" spellcheck="false" autocorrect="off"/>
+
+    <!-- Result output (separate from input — never overrides it) -->
+    <div class="result-box">
+      <div class="result-label">Result</div>
+      <div class="result-value empty" id="output">—</div>
     </div>
 
-    <!-- Output Display (result only — input is never overridden) -->
-    <div class="output">
-      <div class="output-label">Result</div>
-      <div class="output-result is-empty" id="output">—</div>
-    </div>
-
-    <!-- Scientific Buttons -->
-    <div class="sci-row">
-      <button class="sci" data-insert="sqrt(">√(</button>
-      <button class="sci" data-insert="^">xʸ</button>
-      <button class="sci" data-insert="sin(">sin(</button>
-      <button class="sci" data-insert="cos(">cos(</button>
-      <button class="sci" data-insert="tan(">tan(</button>
-      <button class="sci" data-insert="(">(</button>
-      <button class="sci" data-insert=")">)</button>
-      <button class="sci" id="btn-backspace">⌫</button>
+    <!-- Scientific row (8 buttons → 4 columns × 2 rows) -->
+    <div class="sci-grid">
+      <button class="sci-btn" data-insert="sqrt(">√(</button>
+      <button class="sci-btn" data-insert="^">xʸ</button>
+      <button class="sci-btn" data-insert="sin(">sin(</button>
+      <button class="sci-btn" data-insert="cos(">cos(</button>
+      <button class="sci-btn" data-insert="tan(">tan(</button>
+      <button class="sci-btn" data-insert="(">(</button>
+      <button class="sci-btn" data-insert=")">)</button>
+      <button class="sci-btn" id="btn-bs">⌫</button>
     </div>
 
     <!-- Constants -->
-    <div class="const-row">
-      <button class="const span-2" data-insert="pi">π  pi</button>
-      <button class="const span-2" data-insert="e">e  Euler</button>
+    <div class="const-grid">
+      <button class="const-btn" data-insert="pi">π  pi</button>
+      <button class="const-btn" data-insert="e">ℯ  e</button>
     </div>
 
-    <div class="divider"></div>
+    <div class="grid-divider"></div>
 
-    <!-- Standard Grid -->
-    <div class="std-grid">
-      <button class="util" id="btn-ac">AC</button>
-      <button class="util" id="btn-sign">+/−</button>
-      <button class="util" id="btn-percent">%</button>
-      <button class="op"   data-insert="/">÷</button>
+    <!-- Standard 4×5 grid -->
+    <div class="main-grid">
+      <button class="util-btn" id="btn-ac">AC</button>
+      <button class="util-btn" id="btn-sign">+/−</button>
+      <button class="util-btn" id="btn-pct">%</button>
+      <button class="op-btn"   data-insert="/">÷</button>
 
-      <button class="num" data-val="7">7</button>
-      <button class="num" data-val="8">8</button>
-      <button class="num" data-val="9">9</button>
-      <button class="op"  data-insert="*">×</button>
+      <button class="num-btn" data-val="7">7</button>
+      <button class="num-btn" data-val="8">8</button>
+      <button class="num-btn" data-val="9">9</button>
+      <button class="op-btn"  data-insert="*">×</button>
 
-      <button class="num" data-val="4">4</button>
-      <button class="num" data-val="5">5</button>
-      <button class="num" data-val="6">6</button>
-      <button class="op"  data-insert="-">−</button>
+      <button class="num-btn" data-val="4">4</button>
+      <button class="num-btn" data-val="5">5</button>
+      <button class="num-btn" data-val="6">6</button>
+      <button class="op-btn"  data-insert="-">−</button>
 
-      <button class="num" data-val="1">1</button>
-      <button class="num" data-val="2">2</button>
-      <button class="num" data-val="3">3</button>
-      <button class="op"  data-insert="+">+</button>
+      <button class="num-btn" data-val="1">1</button>
+      <button class="num-btn" data-val="2">2</button>
+      <button class="num-btn" data-val="3">3</button>
+      <button class="op-btn"  data-insert="+">+</button>
 
-      <button class="num span-2" data-val="0">0</button>
-      <button class="dot" data-insert=".">.</button>
-      <button class="eq"  id="btn-eq">=</button>
+      <button class="num-btn wide" data-val="0">0</button>
+      <button class="dot-btn"      data-insert=".">.</button>
+      <button class="eq-btn"       id="btn-eq">=</button>
     </div>
-
   </div>
 
-  <!-- ══ RIGHT PANEL ══ -->
+  <!-- ════════ RIGHT PANEL ════════ -->
   <div class="right-panel">
 
     <!-- Variables -->
     <div class="section">
-      <div class="section-title">Variables</div>
+      <div class="section-head">
+        <span class="section-head-title">Variables</span>
+        <div class="section-head-line"></div>
+      </div>
       <div class="var-form">
-        <input type="text" id="var-name"  class="name-in" placeholder="name" maxlength="20" spellcheck="false"/>
-        <input type="text" id="var-value" placeholder="value" spellcheck="false"/>
-        <button class="btn-add" id="btn-add-var">Add</button>
+        <input type="text" id="var-name" class="var-name-in"
+               placeholder="name" maxlength="20" spellcheck="false" autocorrect="off"/>
+        <input type="text" id="var-val"
+               placeholder="value" spellcheck="false" autocorrect="off"/>
+        <button class="add-btn" id="btn-add-var">Add</button>
       </div>
       <div class="var-error" id="var-error"></div>
-      <div class="var-list"  id="var-list">
-        <div class="var-empty">No variables yet</div>
+      <div class="var-list" id="var-list">
+        <div class="empty-msg">No variables yet</div>
       </div>
     </div>
 
     <!-- History -->
     <div class="section">
-      <div class="section-title">
-        History
-        <button class="hist-clear" id="btn-clear-hist">Clear all</button>
+      <div class="section-head">
+        <span class="section-head-title">History</span>
+        <div class="section-head-line"></div>
+        <button class="hist-head-clear" id="btn-clear-hist">Clear all</button>
       </div>
-      <div class="history-list" id="history-list">
-        <div class="hist-empty">No history yet</div>
+      <div class="hist-list" id="hist-list">
+        <div class="empty-msg">No history yet</div>
       </div>
     </div>
 

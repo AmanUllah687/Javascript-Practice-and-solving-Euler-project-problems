@@ -1,18 +1,25 @@
- function fibonacci(limit) {
-  let series = [0,1];
-  for(let i = 2; ; i++) {
-  // Current Number = prev1 + prev2 
-    series[i] = series[i-1] + series[i-2];
-    if(series[i] > limit) {
-      break;
-    }
-  }
-    return series;
-}
-let  FibonaciNumbers = fibonacci(4000000);
-console.log(FibonaciNumbers.reduce((sum, num) => {
-  if (num % 2 === 0) {
-    return sum + num;
-  }
-  return sum;
-}, 0));
+const test = document.getElementById("test");
+
+// This handler will be executed only once when the cursor
+// moves over the unordered list
+test.addEventListener("mouseenter", (event) => {
+  // highlight the mouseenter target
+  event.target.style.color = "purple";
+
+  // reset the color after a short delay
+  setTimeout(() => {
+    event.target.style.color = "";
+  }, 500);
+});
+
+// This handler will be executed every time the cursor
+// is moved over a different list item
+test.addEventListener("mouseover", (event) => {
+  // highlight the mouseover target
+  event.target.style.color = "orange";
+
+  // reset the color after a short delay
+  setTimeout(() => {
+    event.target.style.color = "";
+  }, 500);
+});

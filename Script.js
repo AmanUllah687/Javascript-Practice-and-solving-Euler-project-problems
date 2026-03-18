@@ -1,14 +1,19 @@
-let largest = 0;
-let j;
-for(i=999; i>99; i--) {
-  for(j=999; j>99; j--) {
-    const product = i * j;
-    const str = product.toString();
-    const isPalindrome = str === str.split("").reverse().join("");
-    if(isPalindrome && product > largest) {
-      largest = product;
+let number = 1;
+
+while (true) {
+  let divisibleByAll = true;
+
+  for (let i = 1; i <= 20; i++) {
+    if (number % i !== 0) {
+      divisibleByAll = false;
+      break;
     }
   }
-}
 
-console.log(largest);
+  if (divisibleByAll) {
+    console.log(number); // 232792560
+    break;
+  }
+
+  number++;
+}

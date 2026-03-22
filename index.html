@@ -3,13 +3,51 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>JS Practice</title>
+<title>Currency Converter</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Syne:wght@400;700;800&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="index.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
-    <button id="btn">Get a joke.</button>
-    <para id="joke"></para>
+    <div class="container">
+        <h2>Currency Converter</h2>
+        <form>
+        <div class="amount">
+            <p>Enter Amount</p>
+            <input value="100" type="text" />
+        </div>
+        <div class="dropdown">
+            <div class="from">
+                <p>From</p>
+            <div class="select-container">
+                <img src="https://flagsapi.com/US/flat/64.png" />
+                <select name="from">
+                    <option value="USD">USD</option>
+                    <option value="INR">INR</option>
+                    <option value="EUR">EUR</option>
+                    <option value="AUD">AUD</option>
+
+                </select>
+
+            </div>
+            <i class="fa-solid fa-arrow-right-arrow-left"></i>
+            <div class="to">
+                  <p>To</p>
+            <div class="select-container">
+                <img src="https://flagsapi.com/IN/flat/64.png" />
+                <select name="from">
+                    <option value="USD">USD</option>
+                    <option value="INR" selected>INR</option>
+                    <option value="EUR">EUR</option>
+                    <option value="AUD">AUD</option>
+
+                </select>
+            </div>
+        </div>
+        <div class="msg">1USD = 80INR </div>
+        <button>Get Exchange Rate.</button>
+        </form>
+    </div>
 <script src="App.js"></script>
 </body>
 </html>

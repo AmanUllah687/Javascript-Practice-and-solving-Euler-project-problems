@@ -1,17 +1,26 @@
-let sumOfSquares = 0;
-for(let i=1; i<=100; i++) {
-    sumOfSquares += i*i;
+function isPrime(n) {
+    if(n<=1) {
+        return false;
+    }
+    for(let i = 2;i <= Math.sqrt(n); i++) {
+        if(n % i === 0) {
+            return false;
+        }
+    }
+    return true;
 }
-console.log(sumOfSquares);
-let sum = 0;
-let squareOfSum = 0;
-for(let j=1; j<=100; j++) {
-    sum += j;
-    squareOfSum = sum * sum;
+
+function findNthPrime(n) {
+    let count = 0;
+    let num = 1;
+    while(count < n) {
+        num++;
+        if(isPrime(num)) {
+            count++;
+        }
+
+    }
+    return num;
 }
 
-console.log(squareOfSum)
-
-
-let diff = squareOfSum - sumOfSquares;
-console.log(diff);
+console.log(findNthPrime(10001));

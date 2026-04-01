@@ -1,11 +1,19 @@
-let triplet = 0;
-for(let a=1; a<333; a++) {
-  for(let b=a+1; b < (1000 - a) / 2; b++) {
-    let c = 1000 - a - b;
-    if(a ** 2 + b ** 2 === c ** 2 && c > b) {
-      triplet = a * b * c;
-     }
+let sum = 0;
+const limit = 2000000;
+const sieve = new Array(limit + 1).fill(true);
+sieve[0] = false;
+sieve[1] = false;
+// elimination lopp
+for(let i=2; i<=limit; i++) {
+  if(sieve[i] === true) {
+    for(let j= i*i; j<=limit; j += i) {
+      sieve[j] = false;
+    }
   }
-
 }
-console.log(triplet)
+for(let i=2; i<=limit; i++) {
+  if(sieve[i] === true) {
+    sum += i;
+  }
+}
+console.log(sum);

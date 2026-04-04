@@ -1,22 +1,11 @@
-function countDivisors(n) {
-  let count = 0;
-  for(let i = 1; i <= Math.sqrt(n); i++) {
-    if(n % i === 0) {
-      count += 2;        // i and n/i are both divisors
-      if(i * i === n) {  // perfect square — don't double count
-        count--;
-      }
-    }
-  }
-  return count;
-}
+const numbers = [
+  37107287533902102798797998220837590246510135740250n,
+  46376937677490009712648124896970078050417018260538n,
+  // ... all 100 numbers with "n" at the end for BigInt
+];
+ let sum = 0n;
+ for(let i = 0; i<numbers.length; i++) {
+  sum += numbers[i];
 
-let n=1; 
-while(true) {
-  let triangle = n * (n+1) / 2;
-  if(countDivisors(triangle) > 500) {
-    console.log(triangle);
-    break;
-  }
-  n++;
-}
+ }
+ console.log(sum.toString().slice(0, 10));

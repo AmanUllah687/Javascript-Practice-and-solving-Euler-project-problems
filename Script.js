@@ -1,11 +1,23 @@
-const numbers = [
-  37107287533902102798797998220837590246510135740250n,
-  46376937677490009712648124896970078050417018260538n,
-  // ... all 100 numbers with "n" at the end for BigInt
-];
- let sum = 0n;
- for(let i = 0; i<numbers.length; i++) {
-  sum += numbers[i];
+function collatzLength(n) {
+  let length = 1;
+  while(n !== 1)  {
+    if(n%2 === 0) {
+      n = n/2;
+    } else {
+      n = 3 * n + 1;
 
+    }
+    length ++;
+  }
+  return length;
+}
+ let maxLength = 0;
+ let answer = 0;
+ for(let i= 1; i< 1000000; i++) {
+ let  length = collatzLength(i);
+  if(length > maxLength) {
+    maxLength = length;
+    answer = i;
+  }
  }
- console.log(sum.toString().slice(0, 10));
+ console.log(answer);

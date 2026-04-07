@@ -1,10 +1,9 @@
-function factorial(n) {
-  let result = 1n;
-  for(let i = 1; i<=n; i++) {
-    result *= BigInt(i);
-
-  }
-  return result;
+function powerDigitSum () {
+  const powerOfTwo = BigInt(2) ** BigInt(1000);
+  const digiString = powerOfTwo.toString();
+  const sum = digiString.split('').reduce((acc, digit) => acc + Number(digit),0);
+  return sum;
 }
-let answer = factorial(40) / (factorial(20) * factorial(20));
-console.log(answer.toString());
+
+
+console.log(powerDigitSum());

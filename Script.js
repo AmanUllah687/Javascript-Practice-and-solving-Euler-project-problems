@@ -1,28 +1,28 @@
-const triangle = [
-  [75],
-  [95, 64],
-  [17, 47, 82],
-  [18, 35, 87, 10],
-  [20, 4, 82, 47, 65],
-  [19, 1, 23, 75, 3, 34],
-  [88, 2, 77, 73, 7, 63, 67],
-  [99, 65, 4, 28, 6, 16, 70, 92],
-  [41, 41, 26, 56, 83, 40, 80, 70, 33],
-  [41, 48, 72, 33, 47, 32, 37, 16, 94, 29],
-  [53, 71, 44, 65, 25, 43, 91, 52, 97, 51, 14],
-  [70, 11, 33, 28, 77, 73, 17, 78, 39, 68, 17, 57],
-  [91, 71, 52, 38, 17, 14, 91, 43, 58, 50, 27, 29, 48],
-  [63, 66, 4, 68, 89, 53, 67, 30, 73, 16, 69, 87, 40, 31],
-  [4, 62, 98, 27, 23, 9, 70, 98, 73, 93, 38, 53, 60, 4, 23]
-];
-
-for(let row = triangle.length -2; row >=0; row--) {
-  for(let col=0; col<triangle[row].length; col++) {
-    triangle[row][col] += Math.max(
-      triangle[row+1][col],
-      triangle[row+1][col+1]
-
-    ) 
-  }
+function isLeapYear(year) {
+  if(year % 400 === 0) return true;
+  if(year % 100 === 0) return false;
+  if(year % 4 === 0)   return true;
+  return false;
 }
-console.log(triangle[0][0]);
+
+function daysInMonth(month, year) {
+    const days = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+      //          Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec
+      if(month === 1 && isLeapYear(year)) return 29; // February in leap year
+      return days[month];
+
+}
+function countSundays() {
+  let sundays = 0;
+  let day = 1; // 1 Jan 1900 was a Monday (1 = Monday, 0 = Sunday)
+  for(let year = 1900; year< 2001; year++) {
+    for(let month = 0; month< 12; month++){
+      if(year > 1900 && day === 0) sundays++; // count Sundays (0 = Sunday)
+      day = (day + daysInMonth(month, year)) % 7;
+
+
+    }
+  }
+ return sundays;
+}
+console.log(countSundays()); // 171

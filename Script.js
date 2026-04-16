@@ -1,35 +1,27 @@
-const abundants = [];
+function lexicographicPermutation(n) {
+    const digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+    let index = n - 1; // Convert to 0-based index
+    let result = '';
 
-function d(n) {
-  let sum = 1;
-for(let i = 2; i<=Math.sqrt(n); i++) {
-  if(n % i === 0) {
-    sum += i;
-    if(i !== n/i) {
-    sum += n/i;
-  }
-  }
-}
-return sum;
-}
-for(let n=1; n<= 28123; n++) {
-  if( d(n) > n) {
-    abundants.push(n)
-  }
-}
-const canBeWritten = new Array(28124).fill(false);
-for(let i = 0; i < abundants.length; i++) {
-  for(let j = i; j < abundants.length; j++) {
-    let sum = abundants[i] + abundants[j];
-    if(sum <= 28123) {
-      canBeWritten[sum] =  true
+    // Precompute factorials: fact[i] = i!
+    const fact = [1];
+    for (let i = 1; i <= 9; i++) {
+        fact[i] = fact[i - 1] * i;
     }
-  }
+
+    for (let i = 9; i >= 0; i--) {
+        // Which digit in the remaining list?
+        const digitIndex = Math.floor(index / fact[i]);
+        result += digits[digitIndex];
+
+        // Remove used digit
+        digits.splice(digitIndex, 1);
+
+        // Update index for next position
+        index %= fact[i];
+    }
+
+    return result;
 }
-let total = 0;
-for(let i=1; i<=28123; i++) {
-  if(!canBeWritten[i]) {
-    total += i
-  }
-}
-console.log(total);
+
+console.log(lexicographicPermutation(1000000)); // 2783915460

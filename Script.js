@@ -1,17 +1,27 @@
-function firstFibWithNDigits(n) {
-    let a = 1n;
-    let b = 1n;
-    let index = 2;
+function cycleLength (d) {
+    let remainders = [];
+    let remainder = 1;
+     while (remainder !== 0) {
+        if(remainders.includes(remainder)) {
+           return  remainders.length - remainders.indexOf(remainder);
+        };
+        remainders.push(remainder);
+        remainder = (remainder * 10) % d;
 
-    while(true) {
-        let next  = a + b; 
-        index++;
-        if(String(next).length >= n) {
-            return index;
-        }
-        a = b;
-        b = next;
-
-    }
+     }
+     return 0;
 }
-console.log(firstFibWithNDigits(1000)); // 4782
+function longestRecuringCycle(limit) {
+    let maxLength = 0;
+    let answer = 0;
+    for(let d=2; d<limit; d++) {
+        let length = cycleLength(d);
+        if(length > maxLength) {
+            maxLength = length;
+            answer = d;
+        }
+    }
+ return answer; 
+}
+
+console.log(longestRecuringCycle(1000));

@@ -1,27 +1,37 @@
-function cycleLength (d) {
-    let remainders = [];
-    let remainder = 1;
-     while (remainder !== 0) {
-        if(remainders.includes(remainder)) {
-           return  remainders.length - remainders.indexOf(remainder);
-        };
-        remainders.push(remainder);
-        remainder = (remainder * 10) % d;
-
-     }
-     return 0;
-}
-function longestRecuringCycle(limit) {
-    let maxLength = 0;
-    let answer = 0;
-    for(let d=2; d<limit; d++) {
-        let length = cycleLength(d);
-        if(length > maxLength) {
-            maxLength = length;
-            answer = d;
+function isPrime(n) {
+    if(n<=1) {
+        return false;
+    }
+    for(let i=2; i <= Math.sqrt(n); i++) {
+        if(n % i  ===  0) {
+            return false;
         }
     }
- return answer; 
+ return true;
 }
+function countConsecutivePrimes(a,b) {
+    let count = 0;
+    let n = 0;
+    while(isPrime(n*n + a*n + b)) {
+        count++;
+        n++;
+    }
+return count;
+}
+let bestCount = 0;
+let bestA = 0;
+let bestB = 0;
+for(let b=1; b <= 1000; b++) {
+    if(!isPrime(b)) continue;
+    for(let a= -999; a<= 999; a += 2) {
+        let count = countConsecutivePrimes(a,b);
+        if(count > bestCount) {
+            bestCount = count;
+             bestA = a;
+             bestB = b;
 
-console.log(longestRecuringCycle(1000));
+            
+        }
+    }
+}
+console.log(bestA * bestB);

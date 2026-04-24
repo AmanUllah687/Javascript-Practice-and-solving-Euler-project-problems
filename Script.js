@@ -1,6 +1,9 @@
 
-let sum = 1;
-for(let n=1; n <= 500; n++) {
-   sum += 4 * ((2*n+1) * (2*n+1)) - 12*n
+let distinctPowers = new Set ();
+for(a=2; a<=100; a++) {
+   for(b=2; b<=100; b++) {
+  distinctPowers.add(Math.pow(a, b))
+   }
+
 }
-console.log(sum)
+console.log(distinctPowers.size);

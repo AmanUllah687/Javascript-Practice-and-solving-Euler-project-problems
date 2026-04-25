@@ -1,9 +1,14 @@
-
-let distinctPowers = new Set ();
-for(a=2; a<=100; a++) {
-   for(b=2; b<=100; b++) {
-  distinctPowers.add(Math.pow(a, b))
-   }
-
+function isFifthPowerSum(n) {
+ let digits = n.toString().split('').map(Number);
+ let powered = digits.map(d => Math.pow(d, 5));
+ let sum = powered.reduce((a,b) => a + b, 0);
+ return sum === n;
 }
-console.log(distinctPowers.size);
+
+let total = 0;
+for(i=2; i<=354294; i++) {
+   if(isFifthPowerSum(i)) {
+      total += i;
+   }
+}
+console.log(total);

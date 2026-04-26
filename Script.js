@@ -1,14 +1,10 @@
-function isFifthPowerSum(n) {
- let digits = n.toString().split('').map(Number);
- let powered = digits.map(d => Math.pow(d, 5));
- let sum = powered.reduce((a,b) => a + b, 0);
- return sum === n;
-}
+let coins = [1,2,5,10,20,50,100,200];
+let ways = new Array(201).fill(0);
+ways[0] = 1;
 
-let total = 0;
-for(i=2; i<=354294; i++) {
-   if(isFifthPowerSum(i)) {
-      total += i;
+for(let coin of coins) {
+   for(let amount= coin; amount<=200; amount++) {
+      ways[amount] += ways[amount - coin]
    }
 }
-console.log(total);
+console.log(ways[200]);

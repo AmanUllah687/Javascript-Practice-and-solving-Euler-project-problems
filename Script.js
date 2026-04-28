@@ -1,25 +1,38 @@
-function isPandigital(a, b, product) {
-let combined = a.toString() + b.toString() + product.toString()
-let sorted    = combined.split("").sort().join('');
-return sorted ==='123456789'
-}
+for(num=10; num<=99; num++) {
+  for(let den= num + 1; den<=99; den++) {
+    let numTens = Math.floor(num/10);
+    let numUnits = num % 10;
+    let denTens = Math.floor(den/10);
+    let denUnits = den % 10;
+    if(numUnits === denTens && denUnits !== 0) {
+      if(num * denUnits === numTens * den) {
+        console.log(num + "/" + den)
+      }
 
-let products = new Set();
-for(a=1; a<=9; a++) {
-   for(b=1000; b<=9999; b++) {
-      let product = a * b;
-     if(isPandigital(a, b, product)) {
-       products.add(product)
-     }
-   }
+    }
+
+  }
 }
-for(a=10; a<=99; a++) {
-   for(b=100; b<=999; b++) {
-      let product = a * b;
-     if(isPandigital(a, b, product)) {
-       products.add(product)
-     }
-   }
+function gcd(a,b) {
+  if(b===0) return a;
+  return gcd(b, a % b);
 }
-let answer = Array.from(products).reduce((a,b) => a + b, 0);
-console.log(answer);
+let numProduct = 1;
+let denProduct = 1;
+for(num=10; num<=99; num++) {
+  for(let den= num + 1; den<=99; den++) {
+      let numTens = Math.floor(num/10);
+    let numUnits = num % 10;
+    let denTens = Math.floor(den/10);
+    let denUnits = den % 10;
+    if(numUnits === denTens && denUnits !== 0) {
+      if(num * denUnits === numTens * den) {
+       numProduct *= num;
+       denProduct *= den; 
+
+    }
+
+  }
+}}
+let common = gcd(numProduct, denProduct);
+console.log(denProduct / common);

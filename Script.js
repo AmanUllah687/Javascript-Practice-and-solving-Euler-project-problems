@@ -1,38 +1,22 @@
-for(num=10; num<=99; num++) {
-  for(let den= num + 1; den<=99; den++) {
-    let numTens = Math.floor(num/10);
-    let numUnits = num % 10;
-    let denTens = Math.floor(den/10);
-    let denUnits = den % 10;
-    if(numUnits === denTens && denUnits !== 0) {
-      if(num * denUnits === numTens * den) {
-        console.log(num + "/" + den)
-      }
-
-    }
-
+function factorial(n) {
+  let result = 1;
+  for(i=1; i<=n; i++) {
+    result *= i
   }
+return result;
 }
-function gcd(a,b) {
-  if(b===0) return a;
-  return gcd(b, a % b);
-}
-let numProduct = 1;
-let denProduct = 1;
-for(num=10; num<=99; num++) {
-  for(let den= num + 1; den<=99; den++) {
-      let numTens = Math.floor(num/10);
-    let numUnits = num % 10;
-    let denTens = Math.floor(den/10);
-    let denUnits = den % 10;
-    if(numUnits === denTens && denUnits !== 0) {
-      if(num * denUnits === numTens * den) {
-       numProduct *= num;
-       denProduct *= den; 
-
-    }
-
+ function isFactorialSum(n) {
+  let digits = n.toString().split('').map(Number);
+  let factorials = digits.map(d =>factorial(d));
+  let factorialsSum = factorials.reduce((a,b) => a + b, 0);
+  return factorialsSum === n;
+ }
+ let total = 0;
+ for(let n=3; n<=2540160; n++) {
+  if(isFactorialSum(n)) {
+    total += n;
   }
-}}
-let common = gcd(numProduct, denProduct);
-console.log(denProduct / common);
+ }
+ console.log(total);
+
+  

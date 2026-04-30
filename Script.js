@@ -1,22 +1,31 @@
-function factorial(n) {
-  let result = 1;
-  for(i=1; i<=n; i++) {
-    result *= i
-  }
-return result;
-}
- function isFactorialSum(n) {
-  let digits = n.toString().split('').map(Number);
-  let factorials = digits.map(d =>factorial(d));
-  let factorialsSum = factorials.reduce((a,b) => a + b, 0);
-  return factorialsSum === n;
- }
- let total = 0;
- for(let n=3; n<=2540160; n++) {
-  if(isFactorialSum(n)) {
-    total += n;
-  }
- }
- console.log(total);
+function getRotations(n) {
+  let str = n.toString();
+  let rotations = [];
+  for(i=0; i<=str.length; i++) {
+    rotations.push(Number(str));
+    str = str.slice(1) + str[0];
 
+  }
+  return rotations;
+}
+function isPrime(n) {
+    if(n<=1) {
+        return false;
+    }
+    for(let i = 2;i <= Math.sqrt(n); i++) {
+        if(n % i === 0) {
+            return false;
+        }
+    }
+    return true;
+}
+let count=0;
+for(let n=2; n<= 1000000; n++) {
+  let rotations = getRotations(n);
+  let allPrime = rotations.every(r => isPrime(r));
+  if(allPrime) {
+    count++;
+  }
+}
+console.log(count);
   

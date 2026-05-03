@@ -1,36 +1,22 @@
-function getTruncations(n) {
-  let str = n.toString();
-  let Truncations = [];
-  for(let i=0; i<str.length; i++) {
-    Truncations.push(Number(str.slice(i))); 
-  }
-  for(let i=1; i<str.length; i++) {
-    Truncations.push(Number(str.slice(0, -i)))
-  }
-  return Truncations
+function isPandigital(n) {
+  let pandigital = n.toString();
+  let sorted = pandigital.split('').sort().join('');
+  return sorted === '123456789';
+
 }
-function isPrime(n) {
-  if(n<=1) {
-    return false;
+let largest = 0;
+for(let n=1; n<=9999; n++) {
+  let concat = '';
+  let m = 1;
+  while(concat.length<9) {
+    concat += (n*m);
+    m++;
   }
-  for(i=2; i<=Math.sqrt(n); i++) {
-    if(n % i === 0) {
-      return false
+  if(concat.length === 9 && isPandigital(concat)) {
+    if(Number(concat) > largest){
+    largest = Number(concat);
     }
   }
-  return true;
-}
-let sum = 0;
-let count = 0;
-let n = 11;
-while(count<11) {
- let Truncations = getTruncations(n);
- let allPrime = Truncations.every(r => isPrime(r));
- if(allPrime) {
-  sum += n;
-  count++;
 
- }
- n++;
 }
-console.log(sum);
+console.log(largest);

@@ -1,22 +1,16 @@
-function isPandigital(n) {
-  let pandigital = n.toString();
-  let sorted = pandigital.split('').sort().join('');
-  return sorted === '123456789';
-
-}
-let largest = 0;
-for(let n=1; n<=9999; n++) {
-  let concat = '';
-  let m = 1;
-  while(concat.length<9) {
-    concat += (n*m);
-    m++;
-  }
-  if(concat.length === 9 && isPandigital(concat)) {
-    if(Number(concat) > largest){
-    largest = Number(concat);
+matrix = [[1,2,3],[4,5,6],[7,8,9]]
+var rotate = function (matrix) {
+  n = matrix.length
+   for(let i=0; i<n; i++) {
+    for(let j=i; j<n; j++) {
+      matrix.flat();
+       [matrix[i][j], matrix[j][i]] =
+      [matrix[j][i], matrix[i][j]];
     }
+   }
+    for (let row of matrix) {
+    row.reverse();
   }
-
-}
-console.log(largest);
+  return matrix;
+};
+console.log(rotate(matrix));
